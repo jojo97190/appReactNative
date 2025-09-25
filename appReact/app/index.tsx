@@ -7,11 +7,11 @@ export default function Index() {
     <View style={styles.container}>
       <LoginBubble />
       <View style={styles.header}>
-        <Text style={styles.title}>Page d'Accueil</Text>
         <NavBar />
       </View>
       <View style={styles.content}>
-        {/* Contenu de la page */}
+        <Text style={styles.title}>Page d'Accueil</Text>
+        <Text>Bienvenue sur la page d'accueil!</Text>
       </View>
     </View>
   );
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingVertical: 35,
     backgroundColor: "#f8f9fa",
     borderBottomWidth: 1,
     borderBottomColor: "#dee2e6",

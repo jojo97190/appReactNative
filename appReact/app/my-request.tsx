@@ -7,10 +7,10 @@ export default function MyRequest() {
     <View style={styles.container}>
       <LoginBubble />
       <View style={styles.header}>
-        <Text style={styles.title}>Mes Demandes</Text>
         <NavBar />
       </View>
       <View style={styles.content}>
+        <Text style={styles.title}>Mes Demandes</Text>
         {/* Contenu de la page */}
       </View>
     </View>
@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingVertical: 35,
     backgroundColor: "#f8f9fa",
     borderBottomWidth: 1,
     borderBottomColor: "#dee2e6",
