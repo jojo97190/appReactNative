@@ -5,10 +5,10 @@ export default function Login() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Page de Connexion</Text>
         <NavBar />
       </View>
       <View style={styles.content}>
+        <Text style={styles.title}>Page de Connexion</Text>
         {/* Contenu de la page */}
       </View>
     </View>
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingVertical: 15,
+    paddingVertical: 35,
     backgroundColor: "#f8f9fa",
     borderBottomWidth: 1,
     borderBottomColor: "#dee2e6",

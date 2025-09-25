@@ -6,7 +6,6 @@ export default function NavBar() {
 
   const navButtons = [
     { title: "Accueil", route: "/" },
-    { title: "Login", route: "/login" },
     { title: "Manager", route: "/manager" },
     { title: "Request", route: "/request" },
     { title: "My Request", route: "/my-request" },
