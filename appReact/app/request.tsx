@@ -1,8 +1,13 @@
-import { Text, View, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { Text, TextInput, View, StyleSheet } from "react-native";
+import { Button } from "@react-navigation/elements";
 import NavBar from "../components/NavBar";
 import LoginBubble from "../components/LoginBubble";
+import DateSelector from "../components/selectDate";
 
 export default function Request() {
+  const [motif, setMotif] = useState("");
+  
   return (
     <View style={styles.container}>
       <LoginBubble />
@@ -11,7 +16,22 @@ export default function Request() {
       </View>
       <View style={styles.content}>
         <Text style={styles.title}>Nouvelle Demande</Text>
-        {/* Contenu de la page */}
+
+        <DateSelector />
+
+        <Text>Motif :</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Entrez le motif"
+          value={motif}
+          onChangeText={setMotif}
+        />
+
+        <Button
+          onPress={() => {}}
+        >
+          Envoyer la demande
+        </Button>
       </View>
     </View>
   );
@@ -40,5 +60,13 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     padding: 20,
+  },
+  input: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 20,
   },
 });
