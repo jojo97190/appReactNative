@@ -6,6 +6,13 @@ import DateSelector from "../components/selectDate";
 
 export default function Request() {
   const [motif, setMotif] = useState("");
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+
+  const handleDateRangeSelect = (start: Date, end: Date) => {
+    setStartDate(start);
+    setEndDate(end);
+  };
   
   return (
     <View style={styles.container}>
@@ -15,7 +22,7 @@ export default function Request() {
       <View style={styles.content}>
         <Text style={styles.title}>Nouvelle Demande</Text>
 
-        <DateSelector />
+        <DateSelector onDateRangeSelect={handleDateRangeSelect} />
 
         <Text>Motif :</Text>
         <TextInput
@@ -26,7 +33,9 @@ export default function Request() {
         />
 
         <Button
-          onPress={() => {}}
+          onPress={() => {
+            
+          }}
         >
           Envoyer la demande
         </Button>
@@ -48,6 +57,12 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     backgroundColor: "#f8f9fa",
     borderBottomWidth: 1,
+  },
+  selectedDates: {
+    marginVertical: 10,
+    padding: 10,
+    backgroundColor: '#f8f9fa',
+    borderRadius: 5,
     borderBottomColor: "#dee2e6",
   },
   title: {
