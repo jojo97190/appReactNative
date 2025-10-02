@@ -17,12 +17,18 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
     const daysInMonth = lastDay.getDate();
-    const startDayOfWeek = firstDay.getDay();
+
+    // Obtenir le jour de la semaine (0-6, 0 = dimanche)
+    let firstDayOfWeek = firstDay.getDay();
+    // Convertir dimanche (0) en 7 pour notre calendrier commençant le lundi
+    if (firstDayOfWeek === 0) firstDayOfWeek = 7;
+    // Calculer le nombre de jours vides avant le premier jour (-1 car on commence par lundi)
+    const emptyDaysAtStart = firstDayOfWeek - 1;
 
     const days = [];
     
     // Ajouter les jours vides au début
-    for (let i = 0; i < startDayOfWeek; i++) {
+    for (let i = 0; i < emptyDaysAtStart; i++) {
       days.push(null);
     }
     
@@ -30,14 +36,27 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
     for (let day = 1; day <= daysInMonth; day++) {
       days.push(new Date(year, month, day));
     }
+
+    // Calculer les jours vides à ajouter à la fin pour compléter la dernière semaine
+    const totalDays = days.length;
+    const remainingDays = 7 - (totalDays % 7);
+    if (remainingDays < 7) {
+      for (let i = 0; i < remainingDays; i++) {
+        days.push(null);
+      }
+    }
     
     return days;
   };
 
   const handleDatePress = (date: Date) => {
-    // Empêcher la sélection des dates passées
+    // Empêcher la sélection des dates passées et des weekends
     if (isPastDate(date)) {
-      Alert.alert('Date invalide', 'Vous ne pouvez pas sélectionner une date dépassé.');
+      Alert.alert('Date invalide', 'Vous ne pouvez pas sélectionner une date dépassée.');
+      return;
+    }
+    if (isWeekend(date)) {
+      Alert.alert('Date invalide', 'Vous ne pouvez pas sélectionner les weekends.');
       return;
     }
 
@@ -81,6 +100,11 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
     return compareDate < today;
   };
 
+  const isWeekend = (date: Date) => {
+    const day = date.getDay();
+    return day === 0 || day === 6; // 0 = dimanche, 6 = samedi
+  };
+
   const goToPreviousMonth = () => {
     const newMonth = new Date(currentMonth);
     newMonth.setMonth(currentMonth.getMonth() - 1);
@@ -115,7 +139,7 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
     'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
     'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
   ];
-  const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+  const dayNames = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
   return (
     <View style={styles.container}>
@@ -145,30 +169,36 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
 
       {/* Grille du calendrier */}
       <View style={styles.calendar}>
-        {days.map((date, index) => (
-          <TouchableOpacity
-            key={index}
-            style={[
-              styles.dayCell,
-              !date && styles.emptyCell,
-              date && isDateInRange(date) && styles.selectedCell,
-              date && isStartDate(date) && styles.startDateCell,
-              date && isEndDate(date) && styles.endDateCell,
-              date && isPastDate(date) && styles.pastDateCell,
-            ]}
-            onPress={() => date && handleDatePress(date)}
-            disabled={!date || (date && isPastDate(date))}
-          >
-            <Text
-              style={[
-                styles.dayText,
-                date && isDateInRange(date) && styles.selectedText,
-                date && isPastDate(date) && styles.pastDateText,
-              ]}
-            >
-              {date ? date.getDate() : ''}
-            </Text>
-          </TouchableOpacity>
+        {[0, 1, 2, 3, 4, 5, 6].map(dayIndex => (
+          <View key={dayIndex} style={styles.dayColumn}>
+            {days.filter((_, index) => index % 7 === dayIndex).map((date, index) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.dayCell,
+                  !date && styles.emptyCell,
+                  date && isDateInRange(date) && styles.selectedCell,
+                  date && isStartDate(date) && styles.startDateCell,
+                  date && isEndDate(date) && styles.endDateCell,
+                  date && isPastDate(date) && styles.pastDateCell,
+                  date && isWeekend(date) && styles.weekendCell,
+                ]}
+                onPress={() => date && handleDatePress(date)}
+                disabled={!date || (date && (isPastDate(date) || isWeekend(date)))}
+              >
+                <Text
+                  style={[
+                    styles.dayText,
+                    date && isDateInRange(date) && styles.selectedText,
+                    date && isPastDate(date) && styles.pastDateText,
+                    date && isWeekend(date) && styles.weekendText,
+                  ]}
+                >
+                  {date ? date.getDate() : ''}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
         ))}
       </View>
 
@@ -245,16 +275,21 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   calendar: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
+    flexDirection: 'row',  // Les colonnes sont côte à côte
+    justifyContent: 'space-between',
+    flex: 1,
+  },
+  dayColumn: {
+    width: '14.28%',  // 100% / 7 jours
+    flexDirection: 'column',  // Empile les jours verticalement
   },
   dayCell: {
-    width: '14.28%',
     aspectRatio: 1,
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 5,
     margin: 1,
+    height: 40,  // Hauteur fixe pour chaque cellule
   },
   emptyCell: {
     backgroundColor: 'transparent',
@@ -279,6 +314,14 @@ const styles = StyleSheet.create({
   pastDateCell: {
     backgroundColor: '#f5f5f5',
     opacity: 0.5,
+  },
+  weekendCell: {
+    backgroundColor: '#f5f5f5',
+    opacity: 0.5,
+  },
+  weekendText: {
+    color: '#ccc',
+    textDecorationLine: 'line-through',
   },
   pastDateText: {
     color: '#ccc',

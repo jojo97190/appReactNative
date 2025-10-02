@@ -18,8 +18,8 @@ export default function MyRequest() {
   };
 
   ajouterDemande({id:mesDemandes.length + 1, nom: 'Dupont', prenom: 'Jean', dateDeb: '2025-10-15', dateFin: '2025-10-20', motif: 'Congés annuels', statut: 'En attente'});
-  ajouterDemande({id:mesDemandes.length + 1, nom: 'Lefevre', prenom: 'Alice', dateDeb: '2025-09-10', dateFin: '2025-09-12', motif: 'Rendez-vous médical', statut: 'Refusé'});
-  ajouterDemande({id:mesDemandes.length + 1, nom: 'Durand', prenom: 'Marie', dateDeb: '2025-11-05', dateFin: '2025-11-10', motif: 'Formation professionnelle', statut: 'Validé'});
+  ajouterDemande({id:mesDemandes.length + 1, nom: 'Dupont', prenom: 'Jean', dateDeb: '2025-09-10', dateFin: '2025-09-12', motif: 'Rendez-vous médical', statut: 'Refusé'});
+  ajouterDemande({id:mesDemandes.length + 1, nom: 'Dupont', prenom: 'Jean', dateDeb: '2025-11-05', dateFin: '2025-11-10', motif: 'Formation professionnelle', statut: 'Validé'});
 
   return (
     <View style={styles.container}>

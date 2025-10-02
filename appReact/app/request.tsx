@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Text, TextInput, View, StyleSheet } from "react-native";
+import { Text, TextInput, View, StyleSheet, Alert } from "react-native";
 import { Button } from "@react-navigation/elements";
 import NavBar from "../components/NavBar";
 import DateSelector from "../components/selectDate";
@@ -34,7 +34,9 @@ export default function Request() {
 
         <Button
           onPress={() => {
-            
+            if (startDate && endDate && motif) {
+              Alert.alert("Demande envoyée", `Motif: ${motif}\nDu: ${startDate.toLocaleDateString()}\nAu: ${endDate.toLocaleDateString()}`);
+            }
           }}
         >
           Envoyer la demande
@@ -57,13 +59,6 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     backgroundColor: "#f8f9fa",
     borderBottomWidth: 1,
-  },
-  selectedDates: {
-    marginVertical: 10,
-    padding: 10,
-    backgroundColor: '#f8f9fa',
-    borderRadius: 5,
-    borderBottomColor: "#dee2e6",
   },
   title: {
     fontSize: 24,
