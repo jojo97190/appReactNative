@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Text, TextInput, View, StyleSheet } from "react-native";
 import { Button } from "@react-navigation/elements";
 import NavBar from "../components/NavBar";
-import LoginBubble from "../components/LoginBubble";
 import DateSelector from "../components/selectDate";
 
 export default function Request() {
@@ -10,7 +9,6 @@ export default function Request() {
   
   return (
     <View style={styles.container}>
-      <LoginBubble />
       <View style={styles.header}>
         <NavBar />
       </View>
@@ -47,7 +45,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingVertical: 35,
+    paddingVertical: 20,
     backgroundColor: "#f8f9fa",
     borderBottomWidth: 1,
     borderBottomColor: "#dee2e6",
