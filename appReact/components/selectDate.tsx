@@ -193,7 +193,7 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: 'white',
-    padding: 20,
+    padding: 10,
     borderRadius: 10,
     margin: 10,
     shadowColor: '#000',
