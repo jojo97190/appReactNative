@@ -18,6 +18,7 @@ export default function MyRequest() {
   };
 
   ajouterDemande({id:mesDemandes.length + 1, nom: 'Dupont', prenom: 'Jean', dateDeb: '2025-10-15', dateFin: '2025-10-20', motif: 'Congés annuels', statut: 'En attente'});
+  ajouterDemande({id:mesDemandes.length + 1, nom: 'Lefevre', prenom: 'Alice', dateDeb: '2025-09-10', dateFin: '2025-09-12', motif: 'Rendez-vous médical', statut: 'Refusé'});
   ajouterDemande({id:mesDemandes.length + 1, nom: 'Durand', prenom: 'Marie', dateDeb: '2025-11-05', dateFin: '2025-11-10', motif: 'Formation professionnelle', statut: 'Validé'});
 
   return (
@@ -27,39 +28,38 @@ export default function MyRequest() {
       </View>
       <View style={styles.content}>
         <Text style={styles.title}>Mes Demandes</Text>
-        <ScrollView>          
-          <ScrollView horizontal>
-            <View>
-              {/* En-têtes du tableau */}
-              <View style={styles.headerRow}>
-                <Text style={[styles.headerCell, styles.cellNom]}>Nom</Text>
-                <Text style={[styles.headerCell, styles.cellPrenom]}>Prénom</Text>
-                <Text style={[styles.headerCell, styles.cellDate]}>Début</Text>
-                <Text style={[styles.headerCell, styles.cellDate]}>Fin</Text>
-                <Text style={[styles.headerCell, styles.cellMotif]}>Motif</Text>
-                <Text style={[styles.headerCell, styles.cellStatut]}>Statut</Text>
+        <ScrollView>
+          {mesDemandes.map((demande) => (
+            <View key={demande.id} style={styles.card}>
+              <View style={styles.cardHeader}>
+                <Text style={styles.cardTitle}>{demande.nom} {demande.prenom}</Text>
+                <View style={[
+                  styles.statusBadge,
+                  demande.statut === 'Validé' ? styles.statusValidated :
+                  demande.statut === 'Refusé' ? styles.statusRefused :
+                  styles.statusPending
+                ]}>
+                  <Text style={styles.statusText}>{demande.statut}</Text>
+                </View>
               </View>
               
-              {/* Lignes de données */}
-              {mesDemandes.map((demande, index) => (
-                <View key={demande.id} style={[styles.row, index % 2 === 0 ? styles.evenRow : styles.oddRow]}>
-                  <Text style={[styles.cell, styles.cellNom]}>{demande.nom}</Text>
-                  <Text style={[styles.cell, styles.cellPrenom]}>{demande.prenom}</Text>
-                  <Text style={[styles.cell, styles.cellDate]}>{demande.dateDeb}</Text>
-                  <Text style={[styles.cell, styles.cellDate]}>{demande.dateFin}</Text>
-                  <Text style={[styles.cell, styles.cellMotif]}>{demande.motif}</Text>
-                  <Text style={[styles.cell, styles.cellStatut, 
-                    demande.statut === 'Validé' ? styles.statutValide : 
-                    demande.statut === 'Refusé' ? styles.statutRefuse : 
-                    styles.statutEnAttente]}>{demande.statut}</Text>
+              <View style={styles.cardContent}>
+                <View style={styles.dateContainer}>
+                  <Text style={styles.dateLabel}>Période :</Text>
+                  <Text style={styles.dateText}>Du {demande.dateDeb} au {demande.dateFin}</Text>
                 </View>
-              ))}
+                
+                <View style={styles.motifContainer}>
+                  <Text style={styles.motifLabel}>Motif :</Text>
+                  <Text style={styles.motifText}>{demande.motif}</Text>
+                </View>
+              </View>
             </View>
-          </ScrollView>
+          ))}
         </ScrollView>
       </View>
     </View>
-    );
+);
 }
 
 const styles = StyleSheet.create({
@@ -88,58 +88,74 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  headerRow: {
-    flexDirection: 'row',
-    backgroundColor: '#f8f9fa',
-    borderBottomWidth: 2,
-    borderBottomColor: '#dee2e6',
-  },
-  row: {
-    flexDirection: 'row',
-    borderBottomWidth: 1,
-    borderBottomColor: '#dee2e6',
-  },
-  evenRow: {
+  card: {
     backgroundColor: '#ffffff',
+    borderRadius: 10,
+    marginBottom: 16,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  oddRow: {
-    backgroundColor: '#f8f9fa',
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
   },
-  headerCell: {
-    padding: 12,
+  cardTitle: {
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#495057',
+    color: '#333',
   },
-  cell: {
-    padding: 12,
-    color: '#212529',
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
   },
-  cellNom: {
-    width: 100,
+  statusValidated: {
+    backgroundColor: '#d4edda',
   },
-  cellPrenom: {
-    width: 100,
+  statusRefused: {
+    backgroundColor: '#f8d7da',
   },
-  cellDate: {
-    width: 100,
+  statusPending: {
+    backgroundColor: '#fff3cd',
   },
-  cellMotif: {
-    width: 150,
+  statusText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
-  cellStatut: {
-    width: 100,
-    textAlign: 'center',
+  cardContent: {
+    gap: 12,
   },
-  statutValide: {
-    color: '#198754',
-    fontWeight: 'bold',
+  dateContainer: {
+    marginBottom: 8,
   },
-  statutRefuse: {
-    color: '#dc3545',
-    fontWeight: 'bold',
+  dateLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 4,
   },
-  statutEnAttente: {
-    color: '#ffc107',
-    fontWeight: 'bold',
+  dateText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  motifContainer: {
+    marginBottom: 8,
+  },
+  motifLabel: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 4,
+  },
+  motifText: {
+    fontSize: 16,
+    color: '#333',
   }
 });
