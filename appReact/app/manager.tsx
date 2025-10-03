@@ -1,7 +1,6 @@
 import { Text, View, StyleSheet,FlatList,ScrollView} from "react-native";
 import React, { useEffect, useState } from "react";
 import NavBar from "../components/NavBar";
-import LoginBubble from "../components/LoginBubble";
 import {supabase} from './supabase.js';
 export default function Manager() {
 
