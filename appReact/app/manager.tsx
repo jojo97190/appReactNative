@@ -4,7 +4,7 @@ import NavBar from "../components/NavBar";
 import {supabase} from './supabase.js';
 export default function Manager() {
 
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
 
