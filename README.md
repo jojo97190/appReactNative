@@ -1,4 +1,4 @@
-# Application de Gestion des Congés
+# Application de Gestion d'absences
 
 Cette application mobile développée avec React Native et Expo permet de gérer les demandes d'absences au sein d'une organisation.
 
