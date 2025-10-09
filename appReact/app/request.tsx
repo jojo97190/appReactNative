@@ -1,17 +1,46 @@
-import { Text, View, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { Text, TextInput, View, StyleSheet, Alert } from "react-native";
+import { Button } from "@react-navigation/elements";
 import NavBar from "../components/NavBar";
-import LoginBubble from "../components/LoginBubble";
+import DateSelector from "../components/selectDate";
 
 export default function Request() {
+  const [motif, setMotif] = useState("");
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+
+  const handleDateRangeSelect = (start: Date, end: Date) => {
+    setStartDate(start);
+    setEndDate(end);
+  };
+  
   return (
     <View style={styles.container}>
-      <LoginBubble />
       <View style={styles.header}>
         <NavBar />
       </View>
       <View style={styles.content}>
         <Text style={styles.title}>Nouvelle Demande</Text>
-        {/* Contenu de la page */}
+
+        <DateSelector onDateRangeSelect={handleDateRangeSelect} />
+
+        <Text>Motif :</Text>
+        <TextInput
+          style={styles.input}
+          placeholder="Entrez le motif"
+          value={motif}
+          onChangeText={setMotif}
+        />
+
+        <Button
+          onPress={() => {
+            if (startDate && endDate && motif) {
+              Alert.alert("Demande envoyée", `Motif: ${motif}\nDu: ${startDate.toLocaleDateString()}\nAu: ${endDate.toLocaleDateString()}`);
+            }
+          }}
+        >
+          Envoyer la demande
+        </Button>
       </View>
     </View>
   );
@@ -27,10 +56,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingVertical: 35,
+    paddingVertical: 20,
     backgroundColor: "#f8f9fa",
     borderBottomWidth: 1,
-    borderBottomColor: "#dee2e6",
   },
   title: {
     fontSize: 24,
@@ -39,6 +67,14 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: 35,
+  },
+  input: {
+    height: 40,
+    borderColor: "gray",
+    borderWidth: 1,
+    borderRadius: 5,
+    paddingHorizontal: 10,
+    marginBottom: 20,
   },
 });
