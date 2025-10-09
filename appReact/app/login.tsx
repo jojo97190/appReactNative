@@ -1,14 +1,81 @@
+/*import React, { useEffect, useState } from 'react'
+import { View, Text } from 'react-native'
+import { supabase } from '../../supabase'
+
+export default function Home() {
+  const [users, setUsers] = useState([])
+
+
+  useEffect(() => {
+    fetchUsers()
+}, [])
+
+  async function fetchUsers() {
+    const { data, error } = await supabase
+      .from('users')   // nom de ta table dans Supabase
+      .select('*')
+
+   
+  }
+
+return (
+  <View style={{ padding: 20 }}>
+    <Text style={{ fontSize: 18, fontWeight: 'bold' }}>Liste des utilisateurs :</Text>
+    {users.length > 0 ? (
+      users.map((user) => (
+        <Text key={user.id} style={{ marginTop: 5 }}>
+          {user.id} - {user.nom}  {/* affiche seulement id et nom }
+        </Text>
+      ))
+    ) : (
+      <Text>Aucun utilisateur trouvé.</Text>
+    )}
+  </View>
+)
+
+
+}
+
+
+
+
+la vrai page 
+
+*/
+
+
+
+
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { supabase } from "./supabase.js";
+import 'react-native-url-polyfill/auto'; // ✅ indispensable pour Supabase dans React Native
 
 export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    // Ici tu peux ajouter la logique de connexion (API, vérification, etc.)
-    console.log("Email:", email);
-    console.log("Mot de passe:", password);
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Erreur", "Veuillez remplir tous les champs.");
+      return;
+    }
+
+    setLoading(true);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password: password.trim(),
+    });
+    setLoading(false);
+
+    if (error) {
+      Alert.alert("Erreur de connexion", error.message);
+    } else {
+      Alert.alert("Succès", "Connexion réussie !");
+      console.log("Utilisateur connecté :", data.user);
+      // Ici tu peux naviguer vers une autre page (ex: HomeScreen)
+    }
   };
 
   return (
@@ -34,8 +101,10 @@ export default function LoginScreen() {
         onChangeText={setPassword}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Se connecter</Text>
+      <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+        <Text style={styles.buttonText}>
+          {loading ? "Connexion..." : "Se connecter"}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -78,3 +147,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+
+
+
+
+
+
+
+
