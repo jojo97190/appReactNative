@@ -20,7 +20,7 @@ export default function MyRequest() {
         .from('demande_absence')
         .select(`
           id_absence,
-          utilisateurtest (
+          utilisateurtest:user_id (
             nom,
             prenom
           ),
@@ -28,17 +28,18 @@ export default function MyRequest() {
           absence_dateFin,
           raison,
           statut
-        `);
+        `)
+        .eq('user_id', '36105cf0-4dbe-456c-b0a8-2e9b71c99724'); // Remplacer par l'ID de l'utilisateur connecté
 
       if (error) throw error;
 
       if (data) {
-        // Transformer les données
+        console.log('Données reçues:', data); // Pour le débogage
         const transformedData: DemandeSupabase[] = data.map((item: RawDemandeSupabase) => ({
-          id: item.id_absence, 
+          id: item.id_absence,
           utilisateurtest: {
-            nom: item.utilisateurtest[0]?.nom || '',
-            prenom: item.utilisateurtest[0]?.prenom || ''
+            nom: item.utilisateurtest.nom,
+            prenom: item.utilisateurtest.prenom || 'Non renseigné'
           },
           absence_date: item.absence_date,
           absence_dateFin: item.absence_dateFin,
