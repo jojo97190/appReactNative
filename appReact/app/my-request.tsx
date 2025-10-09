@@ -20,7 +20,7 @@ export default function MyRequest() {
         .from('demande_absence')
         .select(`
           id_absence,
-          utilisateurtest:user_id (
+          utilisateurtest(
             nom,
             prenom
           ),
@@ -38,7 +38,7 @@ export default function MyRequest() {
         const transformedData: DemandeSupabase[] = data.map((item: RawDemandeSupabase) => ({
           id: item.id_absence,
           utilisateurtest: {
-            nom: item.utilisateurtest.nom,
+            nom: item.utilisateurtest.nom || 'Non renseigné',
             prenom: item.utilisateurtest.prenom || 'Non renseigné'
           },
           absence_date: item.absence_date,
