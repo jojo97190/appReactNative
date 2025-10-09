@@ -3,32 +3,7 @@ import React, { useEffect, useState } from "react";
 import NavBar from "../components/NavBar";
 import LoginBubble from "../components/LoginBubble";
 import {supabase} from './supabase.js';
-
-// Interface pour les données brutes de Supabase
-interface RawDemandeSupabase {
-  id_absence: number; // Changé de id à id_absence
-  utilisateurtest: Array<{
-    nom: string;
-    prenom: string;
-  }>;
-  absence_date: string;
-  absence_dateFin: string;
-  raison: string;
-  statut: string;
-}
-
-// Interface pour les données transformées
-interface DemandeSupabase {
-  id: number;
-  utilisateurtest: {
-    nom: string;
-    prenom: string;
-  };
-  absence_date: string;
-  absence_dateFin: string;
-  raison: string;
-  statut: string;
-}
+import { RawDemandeSupabase, DemandeSupabase } from '../types/demande';
 
 export default function MyRequest() {
   const [demandes, setDemandes] = useState<DemandeSupabase[]>([]);
