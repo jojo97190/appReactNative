@@ -8,8 +8,8 @@ export default function NavBar() {
   const navButtons = [
     { title: "Accueil", route: "/" },
     { title: "Manager", route: "/manager" },
-    { title: "Request", route: "/request" },
-    { title: "My Request", route: "/my-request" },
+    { title: "Demande", route: "/request" },
+    { title: "Mes demandes", route: "/my-request" },
   ];
 
   return (
