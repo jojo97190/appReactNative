@@ -44,17 +44,19 @@ la vrai page
 */
 
 
-
-
 import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { supabase } from "./supabase.js";
-import 'react-native-url-polyfill/auto'; // ✅ indispensable pour Supabase dans React Native
+import 'react-native-url-polyfill/auto';
+import { useUserContext } from "./usercontext";
+import { useRouter } from "expo-router";  // <-- import du router
 
 export default function LoginScreen() {
+  const { updateUser, user } = useUserContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const router = useRouter();  // <-- instanciation du router
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -63,19 +65,29 @@ export default function LoginScreen() {
     }
 
     setLoading(true);
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
-      password: password.trim(),
-    });
+
+    const { data, error } = await supabase
+      .from("utilisateurtest")
+      .select("role,id_utilisateur")
+      .eq("email", email.trim())
+      .eq("mot_de_passe", password.trim())
+      .single();
+
     setLoading(false);
 
-    if (error) {
-      Alert.alert("Erreur de connexion", error.message);
-    } else {
-      Alert.alert("Succès", "Connexion réussie !");
-      console.log("Utilisateur connecté :", data.user);
-      // Ici tu peux naviguer vers une autre page (ex: HomeScreen)
+    if (error || !data) {
+      Alert.alert("Erreur", "Email ou mot de passe incorrect.");
+      console.log("Erreur récupération rôle :", error);
+      return;
     }
+
+    updateUser({ role: data.role, id: data.id_utilisateur });
+
+    console.log("ID utilisateur :", data.id_utilisateur);
+    console.log("Utilisateur connecté avec rôle :", data.role);
+    Alert.alert("Succès", `Connexion réussie ! Rôle : ${data.role}`);
+
+    router.push("/");  // <-- redirection vers la page index.tsx
   };
 
   return (
@@ -106,6 +118,9 @@ export default function LoginScreen() {
           {loading ? "Connexion..." : "Se connecter"}
         </Text>
       </TouchableOpacity>
+
+      <Text>Rôle : {user.role ?? "aucun"}</Text>
+      <Text>ID Utilisateur : {user.id ?? "aucun"}</Text>
     </View>
   );
 }
@@ -147,6 +162,8 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+
 
 
 
