@@ -222,6 +222,7 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
 
 const styles = StyleSheet.create({
   container: {
+    height: 500,
     backgroundColor: 'white',
     padding: 10,
     borderRadius: 10,

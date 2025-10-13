@@ -5,7 +5,13 @@ import { useUserContext } from "../app/usercontext.js"; // ✅ CONTEXTE UTILISAT
 
 export default function NavBar() {
   const router = useRouter();
-  const { user } = useUserContext(); // ✅ accès au rôle
+
+  const navButtons = [
+    { title: "Accueil", route: "/" },
+    { title: "Manager", route: "/manager" },
+    { title: "Demande", route: "/request" },
+    { title: "Mes demandes", route: "/my-request" },
+  ];
 
   return (
     <View style={styles.navbar}>
