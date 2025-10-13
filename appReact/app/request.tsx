@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Text, TextInput, View, StyleSheet, Alert, ActivityIndicator, TouchableOpacity } from "react-native";
+import { Text, TextInput, View, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, ScrollView } from "react-native";
 import NavBar from "../components/NavBar";
 import DateSelector from "../components/selectDate";
 import {supabase} from './supabase.js';
-import LoginBubble from "../components/LoginBubble";
 import { NewDemande } from '../types/demande';
 
 export default function Request() {
@@ -76,7 +75,8 @@ export default function Request() {
       <View style={styles.header}>
         <NavBar />
       </View>
-      <View style={styles.content}>
+      <ScrollView>
+        <View style={styles.content}>
         <Text style={styles.title}>Nouvelle Demande</Text>
         <DateSelector onDateRangeSelect={handleDateRangeSelect} />
 
@@ -99,7 +99,9 @@ export default function Request() {
             <Text style={styles.submitButtonText}>Envoyer la demande</Text>
           )}
         </TouchableOpacity>
-      </View>
+        </View>
+      </ScrollView>
+      
     </View>
   );
 }
