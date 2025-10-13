@@ -80,12 +80,10 @@ export default function MyRequest() {
     );
   }
 
-  // Dans le return principal, ajout de LoginBubble
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <NavBar />
-        <LoginBubble />
       </View>
       <View style={styles.content}>
         <Text style={styles.title}>Mes Demandes</Text>
