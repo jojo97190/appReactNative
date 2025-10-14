@@ -4,13 +4,18 @@ import NavBar from "../components/NavBar";
 import DateSelector from "../components/selectDate";
 import {supabase} from './supabase.js';
 import { NewDemande } from '../types/demande';
+import { useUserContext } from "./usercontext";
 
 export default function Request() {
   const [motif, setMotif] = useState("");
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  type User = {
+    id: string;
+  };
 
+  const { user } = useUserContext() as { user: User };
   const handleDateRangeSelect = (start: Date, end: Date) => {
     setStartDate(start);
     setEndDate(end);
@@ -20,7 +25,7 @@ export default function Request() {
     if (startDate && endDate && motif) {
       setIsLoading(true);
       try {
-        const utilisateurId = '36105cf0-4dbe-456c-b0a8-2e9b71c99724';
+        const utilisateurId = user.id;
 
         const newDemande: NewDemande = {
           user_id: utilisateurId,
@@ -32,7 +37,7 @@ export default function Request() {
           date_creation: new Date().toISOString(),
           date_maj: new Date().toISOString()
         };
-
+        
         const { data, error } = await supabase
           .from('demande_absence')
           .insert([newDemande])

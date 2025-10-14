@@ -21,11 +21,17 @@ export default function NavBar() {
 
   return (
     <View style={styles.navbar}>
-      <View style={styles.buttonsContainer}>
+      {user.role === null &&( <View style={styles.buttonsContainer}>
+        <LoginBubble />
+      </View>)}
+
+      {/* ✅ Bubble à droite */}
+      
+    
 
         {/* ✅ Affiche Accueil et Manager si admin */}
         {user.role === "admin" && (
-          <>
+          <View style={styles.navbar}>
             <TouchableOpacity
               style={styles.navButton}
               onPress={() => router.push("/")}
@@ -39,14 +45,15 @@ export default function NavBar() {
             >
               <Text style={styles.navButtonText}>Manager</Text>
             </TouchableOpacity>
-          </>
+            <LoginBubble />
+          </View>
         )}
 
         {/* ✅ Affiche Request et My Request si enseignant */}
         {user.role === "enseignant" && (
 
           
-          <> <TouchableOpacity
+          <View style={styles.navbar}> <TouchableOpacity
               style={styles.navButton}
               onPress={() => router.push("/")}
             >
@@ -66,14 +73,10 @@ export default function NavBar() {
             >
               <Text style={styles.navButtonText}>My Request</Text>
             </TouchableOpacity>
-          </>
+            <LoginBubble />
+          </View>
         )}
-
       </View>
-
-      {/* ✅ Bubble à droite */}
-      <LoginBubble />
-    </View>
   );
 }
 
