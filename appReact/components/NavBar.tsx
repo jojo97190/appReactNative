@@ -1,28 +1,78 @@
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import LoginBubble from "../components/LoginBubble";
+import { useUserContext } from "../app/usercontext.js"; // ✅ CONTEXTE UTILISATEUR
+
+type User = {
+  role: "admin" | "enseignant" | string;
+  // add other properties if needed
+};
 
 export default function NavBar() {
   const router = useRouter();
+  const { user } = useUserContext() as { user: User };
 
   const navButtons = [
     { title: "Accueil", route: "/" },
-    { title: "Login", route: "/login" },
     { title: "Manager", route: "/manager" },
-    { title: "Request", route: "/request" },
-    { title: "My Request", route: "/my-request" },
+    { title: "Demande", route: "/request" },
+    { title: "Mes demandes", route: "/my-request" },
   ];
 
   return (
     <View style={styles.navbar}>
-      {navButtons.map((button, index) => (
-        <TouchableOpacity
-          key={index}
-          style={styles.navButton}
-          onPress={() => router.push(button.route as any)}
-        >
-          <Text style={styles.navButtonText}>{button.title}</Text>
-        </TouchableOpacity>
-      ))}
+      <View style={styles.buttonsContainer}>
+
+        {/* ✅ Affiche Accueil et Manager si admin */}
+        {user.role === "admin" && (
+          <>
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => router.push("/")}
+            >
+              <Text style={styles.navButtonText}>Accueil</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => router.push("/manager")}
+            >
+              <Text style={styles.navButtonText}>Manager</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+        {/* ✅ Affiche Request et My Request si enseignant */}
+        {user.role === "enseignant" && (
+
+          
+          <> <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => router.push("/")}
+            >
+              <Text style={styles.navButtonText}>Accueil</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => router.push("/request")}
+            >
+              <Text style={styles.navButtonText}>Request</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.navButton}
+              onPress={() => router.push("/my-request")}
+            >
+              <Text style={styles.navButtonText}>My Request</Text>
+            </TouchableOpacity>
+          </>
+        )}
+
+      </View>
+
+      {/* ✅ Bubble à droite */}
+      <LoginBubble />
     </View>
   );
 }
@@ -31,18 +81,26 @@ const styles = StyleSheet.create({
   navbar: {
     flexDirection: "row",
     alignItems: "center",
-    flexWrap: "wrap",
-    gap: 6,
+    justifyContent: "space-between",
+    width: "100%",
+    paddingVertical: 15,
   },
   navButton: {
     backgroundColor: "#007AFF",
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 5,
+    marginRight: 6,
   },
   navButtonText: {
     color: "white",
-    fontSize: 11,
+    fontSize: 16,
     fontWeight: "600",
   },
+  buttonsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+  },
 });
+

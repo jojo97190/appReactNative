@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "mon-app",
+    "slug": "mon-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "extra": {
+      "supabaseUrl": "https://dermolqimmivtuwtvyco.supabase.co",
+      "supabaseAnonKey": "COLLE_TA_ANON_KEY_ICI"
+    }
+  }
+}
