@@ -29,8 +29,10 @@ export default function Request() {
 
         const newDemande: NewDemande = {
           user_id: utilisateurId,
-          absence_date: startDate.toISOString().split('-')[0],
-          absence_dateFin: endDate.toISOString().split('-')[0],
+          id_absence: null,
+          date_remplacement: null,
+          absence_date: startDate.toISOString().split('/')[0],
+          absence_dateFin: endDate.toISOString().split('/')[0],
           statut: 'et',
           raison: motif,
           commentaire: null,
@@ -40,8 +42,9 @@ export default function Request() {
         
         const { data, error } = await supabase
           .from('demande_absence')
-          .insert([newDemande])
-          .select();
+          .insert(newDemande)
+          .select()
+          .single();
 
         if (error) throw error;
 

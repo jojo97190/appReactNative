@@ -24,8 +24,10 @@ export interface DemandeSupabase {
 
 export interface NewDemande {
   user_id: string;
+  id_absence : string | null;
   absence_date: string;
   absence_dateFin: string;
+  date_remplacement:string | null;
   statut: 'et' | 'acc' | 'rf';
   raison: string;
   commentaire: string | null;
