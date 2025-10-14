@@ -3,8 +3,14 @@ import { useRouter } from "expo-router";
 import LoginBubble from "../components/LoginBubble";
 import { useUserContext } from "../app/usercontext.js"; // ✅ CONTEXTE UTILISATEUR
 
+type User = {
+  role: "admin" | "enseignant" | string;
+  // add other properties if needed
+};
+
 export default function NavBar() {
   const router = useRouter();
+  const { user } = useUserContext() as { user: User };
 
   const navButtons = [
     { title: "Accueil", route: "/" },
