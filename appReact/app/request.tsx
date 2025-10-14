@@ -24,8 +24,8 @@ export default function Request() {
 
         const newDemande: NewDemande = {
           user_id: utilisateurId,
-          absence_date: startDate.toISOString().split('T')[0],
-          absence_dateFin: endDate.toISOString().split('T')[0],
+          absence_date: startDate.toISOString().split('-')[0],
+          absence_dateFin: endDate.toISOString().split('-')[0],
           statut: 'et',
           raison: motif,
           commentaire: null,
