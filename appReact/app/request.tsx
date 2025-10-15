@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Text, TextInput, View, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, ScrollView } from "react-native";
 import NavBar from "../components/NavBar";
 import DateSelector from "../components/selectDate";
-import {supabase} from './supabase.js';
+import { supabase } from './supabase.js';
 import { NewDemande } from '../types/demande';
 import { useUserContext } from "./usercontext";
 
@@ -11,11 +11,13 @@ export default function Request() {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  
   type User = {
     id: string;
   };
 
   const { user } = useUserContext() as { user: User };
+  
   const handleDateRangeSelect = (start: Date, end: Date) => {
     setStartDate(start);
     setEndDate(end);
@@ -26,27 +28,29 @@ export default function Request() {
       setIsLoading(true);
       try {
         const utilisateurId = user.id;
+        const now = new Date().toISOString();
 
-        const newDemande: NewDemande = {
+        const newDemande = {
           user_id: utilisateurId,
-          id_absence: null,
           date_remplacement: null,
-          absence_date: startDate.toISOString().split('/')[0],
-          absence_dateFin: endDate.toISOString().split('/')[0],
-          statut: 'et',
-          raison: motif,
+          absence_date: startDate.toISOString().split('T')[0],
+          absence_dateFin: endDate.toISOString().split('T')[0],
+          statut: 'et' as const,
+          raison: motif.trim(),
           commentaire: null,
-          date_creation: new Date().toISOString(),
-          date_maj: new Date().toISOString()
+          date_creation: now,
+          date_maj: now
         };
         
-        const { data, error } = await supabase
+        // SOLUTION 1: Sans .select() - essayez d'abord celle-ci
+        const { error } = await supabase
           .from('demande_absence')
-          .insert(newDemande)
-          .select()
-          .single();
+          .insert(newDemande);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Erreur Supabase:", error);
+          throw error;
+        }
 
         Alert.alert(
           "Succès",
@@ -54,7 +58,6 @@ export default function Request() {
           [{ 
             text: "OK", 
             onPress: () => {
-              // Réinitialisation correcte du formulaire
               setMotif("");
               setStartDate(null);
               setEndDate(null);
@@ -62,10 +65,10 @@ export default function Request() {
           }]
         );
       } catch (error: any) {
-        console.error("Erreur lors de l'envoi :", error);
+        console.error("Erreur complète lors de l'envoi :", error);
         Alert.alert(
           "Erreur",
-          "Une erreur est survenue lors de l'envoi de votre demande"
+          error.message || "Une erreur est survenue lors de l'envoi de votre demande"
         );
       } finally {
         setIsLoading(false);
@@ -85,31 +88,30 @@ export default function Request() {
       </View>
       <ScrollView>
         <View style={styles.content}>
-        <Text style={styles.title}>Nouvelle Demande</Text>
-        <DateSelector onDateRangeSelect={handleDateRangeSelect} />
+          <Text style={styles.title}>Nouvelle Demande</Text>
+          <DateSelector onDateRangeSelect={handleDateRangeSelect} />
 
-        <Text>Motif :</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Entrez le motif"
-          value={motif}
-          onChangeText={setMotif}
-        />
+          <Text style={styles.label}>Motif :</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Entrez le motif"
+            value={motif}
+            onChangeText={setMotif}
+          />
 
-        <TouchableOpacity 
-          style={styles.submitButton}
-          onPress={handleSubmit}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.submitButtonText}>Envoyer la demande</Text>
-          )}
-        </TouchableOpacity>
+          <TouchableOpacity 
+            style={[styles.submitButton, isLoading && styles.submitButtonDisabled]}
+            onPress={handleSubmit}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.submitButtonText}>Envoyer la demande</Text>
+            )}
+          </TouchableOpacity>
         </View>
       </ScrollView>
-      
     </View>
   );
 }
@@ -132,19 +134,26 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "bold",
     color: "#333",
+    marginBottom: 20,
   },
   content: {
     flex: 1,
     padding: 35,
   },
+  label: {
+    fontSize: 16,
+    marginBottom: 2,
+    color: "#333",
+  },
   input: {
-    height: 40,
-    borderColor: "gray",
+    minHeight: 45,
+    borderColor: "#ccc",
     borderWidth: 1,
     borderRadius: 5,
     paddingHorizontal: 10,
-    marginBottom: 20,
+    marginBottom: 5,
     textAlignVertical: "top",
+    fontSize: 16,
   },
   submitButton: {
     backgroundColor: "#007bff",
@@ -152,9 +161,12 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     alignItems: "center",
   },
+  submitButtonDisabled: {
+    backgroundColor: "#6c757d",
+  },
   submitButtonText: {
     color: "#fff",
-    fontSize: 15,
+    fontSize: 16,
     fontWeight: "bold",
   },
 });
