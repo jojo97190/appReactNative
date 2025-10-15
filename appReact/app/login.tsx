@@ -122,9 +122,6 @@ export default function LoginScreen() {
           {loading ? "Connexion..." : "Se connecter"}
         </Text>
       </TouchableOpacity>
-
-      <Text>Rôle : {user.role ?? "aucun"}</Text>
-      <Text>ID Utilisateur : {user.id ?? "aucun"}</Text>
     </View>
   );
 }
