@@ -4,11 +4,18 @@ import NavBar from "../components/NavBar";
 import LoginBubble from "../components/LoginBubble";
 import {supabase} from './supabase.js';
 import { RawDemandeSupabase, DemandeSupabase } from '../types/demande';
+import { useUserContext } from "./usercontext";
+
 
 export default function MyRequest() {
   const [demandes, setDemandes] = useState<DemandeSupabase[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  type User = {
+    id: string;
+  };
+
+  const { user } = useUserContext() as { user: User };
 
   useEffect(() => {
     fetchDemandes();
@@ -29,7 +36,7 @@ export default function MyRequest() {
           raison,
           statut
         `)
-        .eq('user_id', '36105cf0-4dbe-456c-b0a8-2e9b71c99724'); // Remplacer par l'ID de l'utilisateur connecté
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
