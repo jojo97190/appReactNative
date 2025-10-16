@@ -72,7 +72,7 @@ export default function LoginScreen() {
 
     const { data, error } = await supabase
       .from("utilisateurtest")
-      .select("role,id_utilisateur")
+      .select("role,id_utilisateur,nom,prenom")
       .eq("email", email.trim())
       .eq("mot_de_passe", password.trim())
       .single();
@@ -85,11 +85,11 @@ export default function LoginScreen() {
       return;
     }
 
-    updateUser({ role: data.role, id: data.id_utilisateur });
+    updateUser({ role: data.role, id: data.id_utilisateur, nom: data.nom, prenom: data.prenom });
 
     console.log("ID utilisateur :", data.id_utilisateur);
-    console.log("Utilisateur connecté avec rôle :", data.role);
-    Alert.alert("Succès", `Connexion réussie ! Rôle : ${data.role}`);
+    
+    Alert.alert("Succès", `Connexion réussie ! role: ${data.role} `);
 
     router.push("/");  // <-- redirection vers la page index.tsx
   };
@@ -97,6 +97,13 @@ export default function LoginScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Connexion</Text>
+
+     <TouchableOpacity
+  style={[styles.button, { backgroundColor: "#373737ff", marginTop: 10, top:260 }]}
+  onPress={() => router.push("/inscription")} // <-- redirection vers Inscription
+>
+  <Text style={styles.buttonText}>Créer un compte</Text>
+</TouchableOpacity>
 
       <TextInput
         style={styles.input}
@@ -162,6 +169,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
   },
+
+  
 });
 
 
