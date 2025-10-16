@@ -1,17 +1,18 @@
-import { Text, View, StyleSheet } from "react-native";
-import NavBar from "../components/NavBar";
+import { StyleSheet, Text, View } from "react-native";
 import LoginBubble from "../components/LoginBubble";
+import NavBar from "../components/NavBar";
 
 export default function Index() {
   return (
     <View style={styles.container}>
-      <LoginBubble />
+     
       <View style={styles.header}>
-        <Text style={styles.title}>Page d'Accueil</Text>
+         <LoginBubble />
+        <Text style={styles.title}></Text>
         <NavBar />
       </View>
       <View style={styles.content}>
-        {/* Contenu de la page */}
+        <Text>Page d'Accueil</Text>
       </View>
     </View>
   );
