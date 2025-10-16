@@ -52,7 +52,11 @@ import { useUserContext } from "./usercontext";
 import { useRouter } from "expo-router";  // <-- import du router
 
 export default function LoginScreen() {
-  const { updateUser, user } = useUserContext();
+  type User = {
+    role: string | null;
+    id: string | null;
+  };
+  const { updateUser, user } = useUserContext() as { updateUser: (user: User) => void; user: User };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -125,8 +129,6 @@ export default function LoginScreen() {
           {loading ? "Connexion..." : "Se connecter"}
         </Text>
       </TouchableOpacity>
-
-    
     </View>
   );
 }
