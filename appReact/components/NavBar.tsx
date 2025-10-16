@@ -5,7 +5,7 @@ import { useUserContext } from "../app/usercontext.js"; // ✅ CONTEXTE UTILISAT
 
 type User = {
   role: "admin" | "enseignant" | string;
-  // add other properties if needed
+  
 };
 
 export default function NavBar() {
@@ -42,7 +42,7 @@ export default function NavBar() {
           </>
         )}
 
-        {/* ✅ Affiche Request et My Request si enseignant */}
+        
         {user.role === "enseignant" && (
 
           
