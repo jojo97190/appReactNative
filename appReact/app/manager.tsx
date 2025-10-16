@@ -1,17 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import NavBar from "../components/NavBar";
-<<<<<<< HEAD
-import { supabase } from "./supabase.js";
-
-export default function Manager() {
-  const [rows, setRows] = useState([]);
-=======
 import {supabase} from './supabase.js';
 export default function Manager() {
 
   const [data, setData] = useState<any[]>([]);
->>>>>>> fda823edaf68f6da2f254f7efa45e59a7ff82041
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
   const [busyId, setBusyId] = useState(null); 
