@@ -141,12 +141,7 @@ export default function Manager() {
 
   return (
     <View style={styles.container}>
-<<<<<<< HEAD
-      <View style={styles.headerBar}>
-        <Text style={styles.title}>Page Manager</Text>
-=======
       <View style={styles.header}>
->>>>>>> fda823edaf68f6da2f254f7efa45e59a7ff82041
         <NavBar />
       </View>
 
