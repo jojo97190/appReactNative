@@ -129,8 +129,6 @@ export default function LoginScreen() {
           {loading ? "Connexion..." : "Se connecter"}
         </Text>
       </TouchableOpacity>
-
-    
     </View>
   );
 }
