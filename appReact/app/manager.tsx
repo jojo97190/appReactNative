@@ -2,32 +2,19 @@ import React, { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import NavBar from "../components/NavBar";
 import {supabase} from './supabase.js';
-export default function Manager() {
 
-  const [data, setData] = useState<any[]>([]);
+export default function Manager() {
+  const [rows, setRows] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState("");
-  const [busyId, setBusyId] = useState(null); 
-  const COLUMNS = [
-    { label: "ID Demande",   key: "id_absence",   width: 120 },
-    { label: "Nom",          key: "nom",          width: 160 },
-    { label: "Prénom",       key: "prenom",       width: 160 },
-    { label: "Email",        key: "email",        width: 240 },
-    { label: "Rôle",         key: "role",         width: 140 },
-    { label: "Du",           key: "du",           width: 150 },
-    { label: "Au",           key: "au",           width: 150 },
-    { label: "Raison",       key: "raison",       width: 220 },
-    { label: "Statut",       key: "statut",       width: 150 },
-    { label: "Remplacement", key: "remplacement", width: 180 },
-    { label: "Commentaire",  key: "commentaire",  width: 280 },
-    { label: "Actions",      key: "actions",  width: 320 },
-  ];
+  const [busyId, setBusyId] = useState<number | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       const { data, error } = await supabase
         .from("user_demandes")
         .select("*")
+        .eq("statut", "et")
         .order("absence_date", { ascending: false });
 
       if (error) {
@@ -55,7 +42,7 @@ export default function Manager() {
   }, []);
 
   
-  const handleSetStatus = async (id_absence, newStatus) => {
+  const handleSetStatus = async (id_absence: number, newStatus: string) => {
     try {
       setBusyId(id_absence);
 
@@ -67,6 +54,11 @@ export default function Manager() {
 
       if (error) {
         setErrorMsg(error.message);
+      } else {
+        // Retirer la demande de la liste après validation/refus
+        setRows(prevRows => 
+          prevRows.filter(row => row.id_absence !== id_absence)
+        );
       }
     } catch (e) {
       setErrorMsg(String(e));
@@ -75,163 +67,299 @@ export default function Manager() {
     }
   };
 
-  if (loading) return <Text>Chargement...</Text>;
-  if (errorMsg) return <Text>Erreur : {errorMsg}</Text>;
-
-  const Header = () => (
-    <View style={[styles.row, styles.headerRow]}>
-      {COLUMNS.map((c) => (
-        <View key={c.key} style={[styles.cellContainer, { width: c.width }]}>
-          <Text style={styles.headerText}>{c.label}</Text>
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <NavBar />
+        <View style={styles.centerContainer}>
+          <ActivityIndicator size="large" color="#3B82F6" />
+          <Text style={styles.loadingText}>Chargement...</Text>
         </View>
-      ))}
-    </View>
-  );
+      </View>
+    );
+  }
 
-  const Row = ({ item, index }) => (
-    <View
-      style={[
-        styles.row,
-        index % 2 === 0 ? styles.rowEven : styles.rowOdd,
-      ]}
-    >
-      {COLUMNS.map((c) => {
-        if (c.key === "actions") { 
-          const isBusy = busyId === item.id_absence;
-          return (
-            <View key={c.key} style={[styles.cellContainer, { width: c.width }]}>
-              {isBusy ? (
-                <ActivityIndicator />
-              ) : (
-                <View style={styles.actionsRow}>
-                  <Pressable
-                    onPress={() => handleSetStatus(item.id_absence, "validée")}
-                    style={[styles.btn, styles.btnSuccess]}
-                  >
-                    <Text style={styles.btnText}>Validé</Text>
-                  </Pressable>
-                  <Pressable
-                    onPress={() => handleSetStatus(item.id_absence, "refusée")}
-                    style={[styles.btn, styles.btnDanger]}
-                  >
-                    <Text style={styles.btnText}>Refusé </Text>
-                  </Pressable>
-                  <Pressable
-                    onPress={() => handleSetStatus(item.id_absence, "en_attente")}
-                    style={[styles.btn, styles.btnWarning]}
-                  >
-                    <Text style={styles.btnText}>En attente</Text>
-                  </Pressable>
-                </View>
-              )}
-            </View>
-          );
-        }
+  if (errorMsg) {
+    return (
+      <View style={styles.container}>
+        <NavBar />
+        <View style={styles.centerContainer}>
+          <Text style={styles.errorText}>Erreur : {errorMsg}</Text>
+        </View>
+      </View>
+    );
+  }
 
-        return (
-          <View key={c.key} style={[styles.cellContainer, { width: c.width }]}>
-            <Text style={styles.cellText} numberOfLines={3}>
-              {item[c.key] ?? "-"}
-            </Text>
+  const getStatusColor = (statut: string) => {
+    switch (statut) {
+      case "validée":
+        return "#10b981";
+      case "refusée":
+        return "#ef4444";
+      case "en_attente":
+        return "#f59e0b";
+      default:
+        return "#6b7280";
+    }
+  };
+
+  const getStatusLabel = (statut: string) => {
+    switch (statut) {
+      case "validée":
+        return "Validée";
+      case "refusée":
+        return "Refusée";
+      case "en_attente":
+        return "En attente";
+      default:
+        return statut;
+    }
+  };
+
+  const Card = ({ item }: { item: any }) => {
+    const isBusy = busyId === item.id_absence;
+    
+    return (
+      <View style={styles.card}>
+        <View style={styles.cardHeader}>
+          <View style={styles.cardHeaderLeft}>
+            <Text style={styles.cardTitle}>{item.prenom} {item.nom}</Text>
+            <Text style={styles.cardSubtitle}>ID: {item.id_absence}</Text>
           </View>
-        );
-      })}
-    </View>
-  );
+        </View>
+
+        <View style={styles.cardBody}>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Email:</Text>
+            <Text style={styles.value}>{item.email || "-"}</Text>
+          </View>
+          
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Rôle:</Text>
+            <Text style={styles.value}>{item.role || "-"}</Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Période:</Text>
+            <Text style={styles.value}>Du {item.du} au {item.au}</Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Raison:</Text>
+            <Text style={styles.value}>{item.raison || "-"}</Text>
+          </View>
+
+          {item.remplacement && (
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>Remplacement:</Text>
+              <Text style={styles.value}>{item.remplacement}</Text>
+            </View>
+          )}
+
+          {item.commentaire && (
+            <View style={styles.infoRow}>
+              <Text style={styles.label}>Commentaire:</Text>
+              <Text style={styles.value}>{item.commentaire}</Text>
+            </View>
+          )}
+        </View>
+
+        <View style={styles.cardFooter}>
+          {isBusy ? (
+            <ActivityIndicator color="#3B82F6" />
+          ) : (
+            <View style={styles.actionsRow}>
+              <Pressable
+                onPress={() => handleSetStatus(item.id_absence, "validée")}
+                style={[styles.btn, styles.btnSuccess]}
+              >
+                <Text style={styles.btnText}>✓ Valider</Text>
+              </Pressable>
+              <Pressable
+                onPress={() => handleSetStatus(item.id_absence, "refusée")}
+                style={[styles.btn, styles.btnDanger]}
+              >
+                <Text style={styles.btnText}>✗ Refuser</Text>
+              </Pressable>
+            </View>
+          )}
+        </View>
+      </View>
+    );
+  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <NavBar />
-      </View>
-
-      <View style={styles.wrap}>
-        <ScrollView horizontal>
-          <View style={styles.table}>
-            <Header />
-            <FlatList
-              data={rows}
-              keyExtractor={(r, i) => String(r.id_absence ?? i)}
-              renderItem={({ item, index }) => <Row item={item} index={index} />}
-              style={{ maxHeight: 520 }}
-            />
-          </View>
-        </ScrollView>
+      <NavBar />
+      
+      <View style={styles.content}>
+        <Text style={styles.pageTitle}>Gestion des demandes d'absence</Text>
+        
+        <FlatList
+          data={rows}
+          keyExtractor={(item, i) => String(item.id_absence ?? i)}
+          renderItem={({ item }) => <Card item={item} />}
+          contentContainerStyle={styles.listContainer}
+          showsVerticalScrollIndicator={false}
+        />
       </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { 
+    flex: 1, 
+    backgroundColor: "#f5f5f5" 
+  },
 
-  headerBar: {
+  content: {
+    flex: 1,
+    padding: 16,
+  },
+
+  pageTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#333",
+    marginBottom: 20,
+    marginTop: 10,
+  },
+
+  listContainer: {
+    paddingBottom: 20,
+  },
+
+  centerContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#666",
+  },
+
+  errorText: {
+    fontSize: 16,
+    color: "#ef4444",
+    textAlign: "center",
+    padding: 20,
+  },
+
+  card: {
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    marginBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    overflow: "hidden",
+  },
+
+  cardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    paddingHorizontal: 20,
-    paddingVertical: 20,
-    backgroundColor: "#f8f9fa",
+    padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#dee2e6",
+    borderBottomColor: "#e5e7eb",
+    backgroundColor: "#f9fafb",
   },
 
-  title: { fontSize: 24, fontWeight: "bold", color: "#333" },
-
-  wrap: { flex: 1, padding: 16, backgroundColor: "#F7F9FC" },
-
-  table: {
-    flexDirection: "column",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    overflow: "hidden",
-    elevation: 2,
-    padding: 10,
+  cardHeaderLeft: {
+    flex: 1,
   },
 
-  row: {
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#111827",
+    marginBottom: 4,
+  },
+
+  cardSubtitle: {
+    fontSize: 12,
+    color: "#6b7280",
+  },
+
+  statusBadge: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+
+  statusText: {
+    color: "#fff",
+    fontSize: 12,
+    fontWeight: "600",
+  },
+
+  cardBody: {
+    padding: 16,
+  },
+
+  infoRow: {
     flexDirection: "row",
-    borderBottomWidth: 1,
-    borderBottomColor: "#EAEAEA",
+    marginBottom: 12,
   },
 
-  headerRow: { backgroundColor: "#3B82F6" },
-
-  cellContainer: {
-    justifyContent: "center",
-    alignItems: "flex-start",
-    paddingVertical: 10,
-    paddingHorizontal: 8,
-    borderRightWidth: 1,
-    borderRightColor: "#EAEAEA",
+  label: {
+    fontSize: 14,
+    fontWeight: "600",
+    color: "#374151",
+    width: 120,
   },
 
-  headerText: { color: "#fff", fontWeight: "bold" },
-
-  cellText: {
-    color: "#333",
-    textAlign: "left",
-    includeFontPadding: false,
-    textAlignVertical: "center",
+  value: {
+    flex: 1,
+    fontSize: 14,
+    color: "#6b7280",
   },
 
-  rowEven: { backgroundColor: "#F9FAFB" },
-  rowOdd: { backgroundColor: "#FFFFFF" },
+  cardFooter: {
+    padding: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#e5e7eb",
+    backgroundColor: "#f9fafb",
+  },
 
   actionsRow: {
     flexDirection: "row",
-    gap: 8, 
+    justifyContent: "space-around",
+    gap: 8,
   },
+
   btn: {
-    paddingVertical: 8,
-    paddingHorizontal: 10,
+    flex: 1,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
     borderRadius: 8,
-    marginRight: 8,
+    alignItems: "center",
+    justifyContent: "center",
   },
-  btnText: { color: "#fff", fontWeight: "600" },
-  btnSuccess: { backgroundColor: "#16a34a" },
-  btnDanger: { backgroundColor: "#dc2626" },
-  btnWarning: { backgroundColor: "#6b7280" },
+
+  btnText: { 
+    color: "#fff", 
+    fontWeight: "600",
+    fontSize: 14,
+  },
+
+  btnSuccess: { 
+    backgroundColor: "#16a34a" 
+  },
+
+  btnDanger: { 
+    backgroundColor: "#dc2626" 
+  },
+
+  btnWarning: { 
+    backgroundColor: "#f59e0b" 
+  },
 });
 
 
