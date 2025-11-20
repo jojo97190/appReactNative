@@ -92,11 +92,11 @@ export default function Manager() {
 
   const getStatusColor = (statut: string) => {
     switch (statut) {
-      case "validée":
+      case "acc":
         return "#10b981";
-      case "refusée":
+      case "rf":
         return "#ef4444";
-      case "en_attente":
+      case "et":
         return "#f59e0b";
       default:
         return "#6b7280";
@@ -105,11 +105,11 @@ export default function Manager() {
 
   const getStatusLabel = (statut: string) => {
     switch (statut) {
-      case "validée":
+      case "acc":
         return "Validée";
-      case "refusée":
+      case "rf":
         return "Refusée";
-      case "en_attente":
+      case "et":
         return "En attente";
       default:
         return statut;
@@ -175,7 +175,7 @@ export default function Manager() {
                 <Text style={styles.btnText}>✓ Valider</Text>
               </Pressable>
               <Pressable
-                onPress={() => handleSetStatus(item.id_absence, "rf")}
+                onPress={() => handleSetStatus(item.id_absence, "ref")}
                 style={[styles.btn, styles.btnDanger]}
               >
                 <Text style={styles.btnText}>✗ Refuser</Text>
