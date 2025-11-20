@@ -170,7 +170,7 @@ export default function Manager() {
                 <Text style={styles.btnText}>✓ Valider</Text>
               </Pressable>
               <Pressable
-                onPress={() => handleSetStatus(item.id_absence, "ref")}
+                onPress={() => handleSetStatus(item.id_absence, "rf")}
                 style={[styles.btn, styles.btnDanger]}
               >
                 <Text style={styles.btnText}>✗ Refuser</Text>
