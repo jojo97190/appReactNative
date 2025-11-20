@@ -210,31 +210,33 @@ export default function Manager() {
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: "#fff" 
+    backgroundColor: "#f0f4f8" 
   },
 
   header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
     paddingHorizontal: 20,
     paddingVertical: 20,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#ffffff",
     borderBottomWidth: 1,
-    borderBottomColor: "#dee2e6",
+    borderBottomColor: "#e2e8f0",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
 
   content: {
     flex: 1,
-    padding: 16,
+    padding: 24,
   },
 
   pageTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#333",
-    marginBottom: 20,
-    marginTop: 10,
+    fontSize: 32,
+    fontWeight: "800",
+    color: "#1e293b",
+    marginBottom: 24,
+    letterSpacing: -0.5,
   },
 
   listContainer: {
@@ -261,25 +263,27 @@ const styles = StyleSheet.create({
   },
 
   card: {
-    backgroundColor: "#fff",
-    borderRadius: 12,
-    marginBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    marginBottom: 20,
+    shadowColor: "#6366f1",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
     overflow: "hidden",
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
   },
 
   cardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 16,
+    padding: 20,
     borderBottomWidth: 1,
-    borderBottomColor: "#e5e7eb",
-    backgroundColor: "#f9fafb",
+    borderBottomColor: "#e2e8f0",
+    backgroundColor: "#f8fafc",
   },
 
   cardHeaderLeft: {
@@ -287,10 +291,11 @@ const styles = StyleSheet.create({
   },
 
   cardTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#111827",
+    fontSize: 20,
+    fontWeight: "700",
+    color: "#1e293b",
     marginBottom: 4,
+    letterSpacing: -0.3,
   },
 
   cardSubtitle: {
@@ -311,7 +316,7 @@ const styles = StyleSheet.create({
   },
 
   cardBody: {
-    padding: 16,
+    padding: 20,
   },
 
   infoRow: {
@@ -320,23 +325,26 @@ const styles = StyleSheet.create({
   },
 
   label: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#374151",
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#475569",
     width: 120,
+    textTransform: "uppercase",
+    letterSpacing: 0.3,
   },
 
   value: {
     flex: 1,
-    fontSize: 14,
-    color: "#6b7280",
+    fontSize: 15,
+    color: "#1e293b",
+    fontWeight: "500",
   },
 
   cardFooter: {
-    padding: 16,
+    padding: 20,
     borderTopWidth: 1,
-    borderTopColor: "#e5e7eb",
-    backgroundColor: "#f9fafb",
+    borderTopColor: "#e2e8f0",
+    backgroundColor: "#f8fafc",
   },
 
   actionsRow: {
@@ -347,25 +355,31 @@ const styles = StyleSheet.create({
 
   btn: {
     flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 8,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
   },
 
   btnText: { 
     color: "#fff", 
-    fontWeight: "600",
-    fontSize: 14,
+    fontWeight: "700",
+    fontSize: 15,
+    letterSpacing: 0.3,
   },
 
   btnSuccess: { 
-    backgroundColor: "#16a34a" 
+    backgroundColor: "#10b981" 
   },
 
   btnDanger: { 
-    backgroundColor: "#dc2626" 
+    backgroundColor: "#ef4444" 
   },
 
   btnWarning: { 
