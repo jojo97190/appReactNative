@@ -134,11 +134,6 @@ export default function Manager() {
           </View>
           
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Rôle:</Text>
-            <Text style={styles.value}>{item.role || "-"}</Text>
-          </View>
-
-          <View style={styles.infoRow}>
             <Text style={styles.label}>Période:</Text>
             <Text style={styles.value}>Du {item.du} au {item.au}</Text>
           </View>
