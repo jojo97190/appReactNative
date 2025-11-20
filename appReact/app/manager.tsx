@@ -70,7 +70,9 @@ export default function Manager() {
   if (loading) {
     return (
       <View style={styles.container}>
-        <NavBar />
+        <View style={styles.header}>
+          <NavBar />
+        </View>
         <View style={styles.centerContainer}>
           <ActivityIndicator size="large" color="#3B82F6" />
           <Text style={styles.loadingText}>Chargement...</Text>
@@ -82,7 +84,9 @@ export default function Manager() {
   if (errorMsg) {
     return (
       <View style={styles.container}>
-        <NavBar />
+        <View style={styles.header}>
+          <NavBar />
+        </View>
         <View style={styles.centerContainer}>
           <Text style={styles.errorText}>Erreur : {errorMsg}</Text>
         </View>
@@ -184,7 +188,9 @@ export default function Manager() {
 
   return (
     <View style={styles.container}>
-      <NavBar />
+      <View style={styles.header}>
+        <NavBar />
+      </View>
       
       <View style={styles.content}>
         <Text style={styles.pageTitle}>Gestion des demandes d'absence</Text>
@@ -204,7 +210,18 @@ export default function Manager() {
 const styles = StyleSheet.create({
   container: { 
     flex: 1, 
-    backgroundColor: "#f5f5f5" 
+    backgroundColor: "#fff" 
+  },
+
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    backgroundColor: "#f8f9fa",
+    borderBottomWidth: 1,
+    borderBottomColor: "#dee2e6",
   },
 
   content: {
