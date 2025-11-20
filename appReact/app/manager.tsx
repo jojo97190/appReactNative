@@ -92,11 +92,11 @@ export default function Manager() {
 
   const getStatusColor = (statut: string) => {
     switch (statut) {
-      case "validée":
+      case "acc":
         return "#10b981";
-      case "refusée":
+      case "rf":
         return "#ef4444";
-      case "en_attente":
+      case "et":
         return "#f59e0b";
       default:
         return "#6b7280";
@@ -105,11 +105,11 @@ export default function Manager() {
 
   const getStatusLabel = (statut: string) => {
     switch (statut) {
-      case "validée":
+      case "acc":
         return "Validée";
-      case "refusée":
+      case "rf":
         return "Refusée";
-      case "en_attente":
+      case "et":
         return "En attente";
       default:
         return statut;
@@ -124,7 +124,6 @@ export default function Manager() {
         <View style={styles.cardHeader}>
           <View style={styles.cardHeaderLeft}>
             <Text style={styles.cardTitle}>{item.prenom} {item.nom}</Text>
-            <Text style={styles.cardSubtitle}>ID: {item.id_absence}</Text>
           </View>
         </View>
 
@@ -134,11 +133,6 @@ export default function Manager() {
             <Text style={styles.value}>{item.email || "-"}</Text>
           </View>
           
-          <View style={styles.infoRow}>
-            <Text style={styles.label}>Rôle:</Text>
-            <Text style={styles.value}>{item.role || "-"}</Text>
-          </View>
-
           <View style={styles.infoRow}>
             <Text style={styles.label}>Période:</Text>
             <Text style={styles.value}>Du {item.du} au {item.au}</Text>
@@ -170,13 +164,13 @@ export default function Manager() {
           ) : (
             <View style={styles.actionsRow}>
               <Pressable
-                onPress={() => handleSetStatus(item.id_absence, "validée")}
+                onPress={() => handleSetStatus(item.id_absence, "acc")}
                 style={[styles.btn, styles.btnSuccess]}
               >
                 <Text style={styles.btnText}>✓ Valider</Text>
               </Pressable>
               <Pressable
-                onPress={() => handleSetStatus(item.id_absence, "refusée")}
+                onPress={() => handleSetStatus(item.id_absence, "rf")}
                 style={[styles.btn, styles.btnDanger]}
               >
                 <Text style={styles.btnText}>✗ Refuser</Text>
