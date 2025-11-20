@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { supabase } from "./supabase.js";
 import { useRouter } from "expo-router";
+import { Picker } from "@react-native-picker/picker";
 
 export default function InscriptionScreen() {
   const [prenom, setPrenom] = useState("");
@@ -21,7 +22,6 @@ export default function InscriptionScreen() {
     setLoading(true);
 
     try {
-      // Vérifie si l'email existe déjà
       const { data: existingUser, error: selectError } = await supabase
         .from("utilisateurtest")
         .select("email")
@@ -36,21 +36,17 @@ export default function InscriptionScreen() {
         return;
       }
 
-      // Insertion du nouvel utilisateur
       const { error: insertError } = await supabase.from("utilisateurtest").insert([
         {
           nom: nom.trim(),
-          prenom: prenom.trim(), 
+          prenom: prenom.trim(),
           email: email.trim(),
           mot_de_passe: password.trim(),
-          role: role.trim(),
+          role: role,
         },
       ]);
 
-      if (insertError) {
-        console.error("Erreur Supabase :", insertError.message);
-        throw insertError;
-      }
+      if (insertError) throw insertError;
 
       Alert.alert("Succès", "Compte créé avec succès !");
       router.push("/login");
@@ -101,13 +97,19 @@ export default function InscriptionScreen() {
         onChangeText={setPassword}
       />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Rôle (admin ou enseignant)"
-        placeholderTextColor="#aaa"
-        value={role}
-        onChangeText={setRole}
-      />
+      {/* Picker sans la ligne noire */}
+      <View style={styles.input}>
+        <Picker
+          selectedValue={role}
+          onValueChange={(value) => setRole(value)}
+          mode="dropdown"          // <- SUPPRIME LA LIGNE NOIRE
+          style={{ borderWidth: 0 }} // <- SUPPRIME LA LIGNE NOIRE
+        >
+          <Picker.Item label="-- Sélectionnez un rôle --" value="" />
+          <Picker.Item label="Admin" value="admin" />
+          <Picker.Item label="Enseignant" value="enseignant" />
+        </Picker>
+      </View>
 
       <TouchableOpacity style={styles.button} onPress={handleSignup} disabled={loading}>
         <Text style={styles.buttonText}>
@@ -147,6 +149,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginBottom: 20,
     backgroundColor: "#fff",
+    justifyContent: "center",
   },
   button: {
     width: "100%",
@@ -162,4 +165,3 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
-
