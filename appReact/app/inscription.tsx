@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Modal, ScrollView } from "react-native";
 import { supabase } from "./supabase.js";
 import { useRouter } from "expo-router";
-import { Picker } from "@react-native-picker/picker";
 
 export default function InscriptionScreen() {
   const [prenom, setPrenom] = useState("");
@@ -11,7 +10,23 @@ export default function InscriptionScreen() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const router = useRouter();
+
+  const roles = [
+    { label: "Admin", value: "admin" },
+    { label: "Enseignant", value: "enseignant" },
+  ];
+
+  const handleRoleSelect = (value: string) => {
+    setRole(value);
+    setModalVisible(false);
+  };
+
+  const getRoleLabel = () => {
+    const selectedRole = roles.find(r => r.value === role);
+    return selectedRole ? selectedRole.label : "Sélectionnez un rôle";
+  };
 
   const handleSignup = async () => {
     if (!nom || !prenom || !email || !password || !role) {
@@ -92,24 +107,64 @@ export default function InscriptionScreen() {
         style={styles.input}
         placeholder="Mot de passe"
         placeholderTextColor="#aaa"
-        secureTextEntry
+        secureTextEntry={true}
+        autoCapitalize="none"
+        autoCorrect={false}
+        textContentType="password"
         value={password}
         onChangeText={setPassword}
       />
 
-      {/* Picker sans la ligne noire */}
-      <View style={styles.input}>
-        <Picker
-          selectedValue={role}
-          onValueChange={(value) => setRole(value)}
-          mode="dropdown"          // <- SUPPRIME LA LIGNE NOIRE
-          style={{ borderWidth: 0 }} // <- SUPPRIME LA LIGNE NOIRE
-        >
-          <Picker.Item label="-- Sélectionnez un rôle --" value="" />
-          <Picker.Item label="Admin" value="admin" />
-          <Picker.Item label="Enseignant" value="enseignant" />
-        </Picker>
-      </View>
+      {/* Sélecteur de rôle personnalisé */}
+      <TouchableOpacity 
+        style={styles.roleSelector} 
+        onPress={() => setModalVisible(true)}
+      >
+        <Text style={[styles.roleSelectorText, !role && styles.placeholderText]}>
+          {getRoleLabel()}
+        </Text>
+        <Text style={styles.dropdownIcon}>▼</Text>
+      </TouchableOpacity>
+
+      {/* Modal pour la sélection du rôle */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Sélectionnez un rôle</Text>
+            
+            {roles.map((item) => (
+              <TouchableOpacity
+                key={item.value}
+                style={[
+                  styles.roleOption,
+                  role === item.value && styles.roleOptionSelected
+                ]}
+                onPress={() => handleRoleSelect(item.value)}
+              >
+                <Text style={[
+                  styles.roleOptionText,
+                  role === item.value && styles.roleOptionTextSelected
+                ]}>
+                  {item.label}
+                </Text>
+                {role === item.value && <Text style={styles.checkmark}>✓</Text>}
+              </TouchableOpacity>
+            ))}
+            
+            <TouchableOpacity
+              style={styles.closeButton}
+              onPress={() => setModalVisible(false)}
+            >
+              <Text style={styles.closeButtonText}>Fermer</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       <TouchableOpacity style={styles.button} onPress={handleSignup} disabled={loading}>
         <Text style={styles.buttonText}>
@@ -149,7 +204,92 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginBottom: 20,
     backgroundColor: "#fff",
+    fontSize: 16,
+  },
+  roleSelector: {
+    width: "100%",
+    height: 50,
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 8,
+    marginBottom: 20,
+    backgroundColor: "#fff",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 15,
+  },
+  roleSelectorText: {
+    fontSize: 16,
+    color: "#000",
+  },
+  placeholderText: {
+    color: "#aaa",
+  },
+  dropdownIcon: {
+    fontSize: 12,
+    color: "#666",
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
     justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContent: {
+    width: "80%",
+    backgroundColor: "#fff",
+    borderRadius: 12,
+    padding: 20,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+  roleOption: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 15,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    marginBottom: 10,
+    backgroundColor: "#f5f5f5",
+  },
+  roleOptionSelected: {
+    backgroundColor: "#007bff",
+  },
+  roleOptionText: {
+    fontSize: 16,
+    color: "#000",
+  },
+  roleOptionTextSelected: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  checkmark: {
+    fontSize: 20,
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  closeButton: {
+    marginTop: 10,
+    paddingVertical: 12,
+    backgroundColor: "#6c757d",
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  closeButtonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
   button: {
     width: "100%",
