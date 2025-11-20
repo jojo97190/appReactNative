@@ -124,7 +124,6 @@ export default function Manager() {
         <View style={styles.cardHeader}>
           <View style={styles.cardHeaderLeft}>
             <Text style={styles.cardTitle}>{item.prenom} {item.nom}</Text>
-            <Text style={styles.cardSubtitle}>ID: {item.id_absence}</Text>
           </View>
         </View>
 
