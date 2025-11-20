@@ -170,13 +170,13 @@ export default function Manager() {
           ) : (
             <View style={styles.actionsRow}>
               <Pressable
-                onPress={() => handleSetStatus(item.id_absence, "validée")}
+                onPress={() => handleSetStatus(item.id_absence, "acc")}
                 style={[styles.btn, styles.btnSuccess]}
               >
                 <Text style={styles.btnText}>✓ Valider</Text>
               </Pressable>
               <Pressable
-                onPress={() => handleSetStatus(item.id_absence, "refusée")}
+                onPress={() => handleSetStatus(item.id_absence, "rf")}
                 style={[styles.btn, styles.btnDanger]}
               >
                 <Text style={styles.btnText}>✗ Refuser</Text>
