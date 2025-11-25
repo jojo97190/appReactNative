@@ -50,6 +50,23 @@ export default function Request() {
         return;
       }
 
+      // Vérifier que l'heure de fin est après l'heure de début
+      if (hasReplacement && replacementStartTime && replacementEndTime) {
+        const [startHour, startMinute] = replacementStartTime.split(':').map(Number);
+        const [endHour, endMinute] = replacementEndTime.split(':').map(Number);
+        
+        const startTimeInMinutes = startHour * 60 + startMinute;
+        const endTimeInMinutes = endHour * 60 + endMinute;
+        
+        if (endTimeInMinutes <= startTimeInMinutes) {
+          Alert.alert(
+            "Horaire invalide",
+            "L'heure de fin doit être après l'heure de début"
+          );
+          return;
+        }
+      }
+
       setIsLoading(true);
       try {
         const utilisateurId = user.id;
