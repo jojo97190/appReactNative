@@ -55,6 +55,8 @@ export default function LoginScreen() {
   type User = {
     role: string | null;
     id: string | null;
+    nom?: string;
+    prenom?: string;
   };
   const { updateUser, user } = useUserContext() as { updateUser: (user: User) => void; user: User };
   const [email, setEmail] = useState("");

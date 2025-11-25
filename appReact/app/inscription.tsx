@@ -113,7 +113,7 @@ export default function InscriptionScreen() {
 
       Alert.alert("Succès", "Compte créé avec succès !");
       router.push("/login");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erreur :", error.message || error);
       Alert.alert("Erreur", "Une erreur est survenue lors de la création du compte.");
     } finally {
