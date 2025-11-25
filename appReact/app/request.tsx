@@ -263,7 +263,7 @@ export default function Request() {
             <Text style={styles.sectionTitle}>📅 Horaire de remplacement</Text>
             
             <View style={styles.switchContainer}>
-              <Text style={styles.switchLabel}>Ajouter un horaire de remplacement ?</Text>
+              <Text style={styles.switchLabel}>Ajouter un horaire{'\n'}de remplacement ?</Text>
               <TouchableOpacity
                 style={[styles.switchButton, hasReplacement && styles.switchButtonActive]}
                 onPress={() => setHasReplacement(!hasReplacement)}
@@ -473,11 +473,14 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: 20,
+    flexWrap: "nowrap",
   },
   switchLabel: {
     fontSize: 16,
     color: "#475569",
     fontWeight: "600",
+    flex: 1,
+    marginRight: 12,
   },
   switchButton: {
     backgroundColor: "#e2e8f0",

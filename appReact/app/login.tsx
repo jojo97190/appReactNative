@@ -91,8 +91,6 @@ export default function LoginScreen() {
 
     console.log("ID utilisateur :", data.id_utilisateur);
     
-    Alert.alert("Succès", `Connexion réussie ! role: ${data.role} `);
-
     router.push("/");  // <-- redirection vers la page index.tsx
   };
 
