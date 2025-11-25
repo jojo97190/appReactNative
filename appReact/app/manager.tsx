@@ -31,7 +31,11 @@ export default function Manager() {
           au: d.absence_dateFin,
           raison: d.raison,
           statut: d.statut,
-          remplacement: d.date_remplacement,
+          date_remplacement: d.date_remplacement,
+          heure_remplacement_deb: d.heure_remplacement_deb,
+          heure_remplacement_fin: d.heure_remplacement_fin,
+          salle_remplacement: d.salle_remplacement,
+          classe: d.classe,
           commentaire: d.commentaire,
         }));
         setRows(flat);
@@ -147,17 +151,51 @@ export default function Manager() {
             <Text style={styles.value}>{item.raison || "-"}</Text>
           </View>
 
-          {item.remplacement && (
-            <View style={styles.infoRow}>
-              <Text style={styles.label}>Remplacement:</Text>
-              <Text style={styles.value}>{item.remplacement}</Text>
-            </View>
-          )}
-
           {item.commentaire && (
             <View style={styles.infoRow}>
               <Text style={styles.label}>Commentaire:</Text>
               <Text style={styles.value}>{item.commentaire}</Text>
+            </View>
+          )}
+
+          {/* Section Remplacement */}
+          {item.date_remplacement && (
+            <View style={styles.replacementSection}>
+              <Text style={styles.replacementTitle}>📅 Remplacement prévu</Text>
+              
+              <View style={styles.replacementInfo}>
+                <Text style={styles.replacementLabel}>Date:</Text>
+                <Text style={styles.replacementValue}>
+                  {new Date(item.date_remplacement).toLocaleDateString('fr-FR')}
+                </Text>
+              </View>
+
+              {item.heure_remplacement_deb && item.heure_remplacement_fin && (
+                <View style={styles.replacementInfo}>
+                  <Text style={styles.replacementLabel}>Horaire:</Text>
+                  <Text style={styles.replacementValue}>
+                    {item.heure_remplacement_deb} - {item.heure_remplacement_fin}
+                  </Text>
+                </View>
+              )}
+
+              {item.salle_remplacement && (
+                <View style={styles.replacementInfo}>
+                  <Text style={styles.replacementLabel}>Salle:</Text>
+                  <Text style={styles.replacementValue}>
+                    {item.salle_remplacement}
+                  </Text>
+                </View>
+              )}
+
+              {item.classe && (
+                <View style={styles.replacementInfo}>
+                  <Text style={styles.replacementLabel}>Classe:</Text>
+                  <Text style={styles.replacementValue}>
+                    {item.classe}
+                  </Text>
+                </View>
+              )}
             </View>
           )}
         </View>
@@ -384,6 +422,42 @@ const styles = StyleSheet.create({
 
   btnWarning: { 
     backgroundColor: "#f59e0b" 
+  },
+
+  replacementSection: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#e2e8f0",
+  },
+
+  replacementTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#6366f1",
+    marginBottom: 12,
+    letterSpacing: -0.3,
+  },
+
+  replacementInfo: {
+    flexDirection: "row",
+    marginBottom: 8,
+  },
+
+  replacementLabel: {
+    fontSize: 13,
+    fontWeight: "700",
+    color: "#475569",
+    width: 120,
+    textTransform: "uppercase",
+    letterSpacing: 0.3,
+  },
+
+  replacementValue: {
+    flex: 1,
+    fontSize: 15,
+    color: "#1e293b",
+    fontWeight: "600",
   },
 });
 

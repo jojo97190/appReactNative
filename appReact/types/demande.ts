@@ -8,6 +8,11 @@ export interface RawDemandeSupabase {
   absence_dateFin: string;
   raison: string;
   statut: string;
+  date_remplacement?: string | null;
+  heure_remplacement_deb?: string | null;
+  heure_remplacement_fin?: string | null;
+  salle_remplacement?: string | null;
+  classe?: string | null;
 }
 
 export interface DemandeSupabase {
@@ -20,6 +25,11 @@ export interface DemandeSupabase {
   absence_dateFin: string;
   raison: string;
   statut: string;
+  date_remplacement?: string | null;
+  heure_remplacement_deb?: string | null;
+  heure_remplacement_fin?: string | null;
+  salle_remplacement?: string | null;
+  classe?: string | null;
 }
 
 export interface NewDemande {

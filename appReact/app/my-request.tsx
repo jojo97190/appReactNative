@@ -34,7 +34,12 @@ export default function MyRequest() {
           absence_date,
           absence_dateFin,
           raison,
-          statut
+          statut,
+          date_remplacement,
+          heure_remplacement_deb,
+          heure_remplacement_fin,
+          salle_remplacement,
+          classe
         `)
         .eq('user_id', user.id);
 
@@ -51,7 +56,12 @@ export default function MyRequest() {
           absence_date: item.absence_date,
           absence_dateFin: item.absence_dateFin,
           raison: item.raison,
-          statut: item.statut
+          statut: item.statut,
+          date_remplacement: item.date_remplacement,
+          heure_remplacement_deb: item.heure_remplacement_deb,
+          heure_remplacement_fin: item.heure_remplacement_fin,
+          salle_remplacement: item.salle_remplacement,
+          classe: item.classe
         }));
         
         setDemandes(transformedData);
@@ -133,6 +143,47 @@ export default function MyRequest() {
                   <Text style={styles.motifLabel}>Motif :</Text>
                   <Text style={styles.motifText}>{demande.raison}</Text>
                 </View>
+
+                {/* Informations de remplacement */}
+                {demande.date_remplacement && (
+                  <View style={styles.replacementContainer}>
+                    <Text style={styles.replacementTitle}>📅 Remplacement prévu</Text>
+                    
+                    <View style={styles.replacementInfo}>
+                      <Text style={styles.replacementLabel}>Date :</Text>
+                      <Text style={styles.replacementValue}>
+                        {new Date(demande.date_remplacement).toLocaleDateString('fr-FR')}
+                      </Text>
+                    </View>
+
+                    {demande.heure_remplacement_deb && demande.heure_remplacement_fin && (
+                      <View style={styles.replacementInfo}>
+                        <Text style={styles.replacementLabel}>Horaire :</Text>
+                        <Text style={styles.replacementValue}>
+                          {demande.heure_remplacement_deb} - {demande.heure_remplacement_fin}
+                        </Text>
+                      </View>
+                    )}
+
+                    {demande.salle_remplacement && (
+                      <View style={styles.replacementInfo}>
+                        <Text style={styles.replacementLabel}>Salle :</Text>
+                        <Text style={styles.replacementValue}>
+                          {demande.salle_remplacement}
+                        </Text>
+                      </View>
+                    )}
+
+                    {demande.classe && (
+                      <View style={styles.replacementInfo}>
+                        <Text style={styles.replacementLabel}>Classe :</Text>
+                        <Text style={styles.replacementValue}>
+                          {demande.classe}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                )}
               </View>
             </View>
           ))}
@@ -259,5 +310,33 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#64748b",
     fontWeight: "500",
+  },
+  replacementContainer: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#e2e8f0",
+  },
+  replacementTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#6366f1",
+    marginBottom: 12,
+    letterSpacing: -0.3,
+  },
+  replacementInfo: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 8,
+  },
+  replacementLabel: {
+    fontSize: 14,
+    color: "#64748b",
+    fontWeight: "600",
+  },
+  replacementValue: {
+    fontSize: 14,
+    color: "#1e293b",
+    fontWeight: "600",
   },
 });
