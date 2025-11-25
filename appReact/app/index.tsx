@@ -12,6 +12,7 @@ export default function AbsenceStats() {
     accepted: 0,
     refused: 0,
   });
+  const [adminPendingCount, setAdminPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
   
   type User = {
@@ -32,46 +33,62 @@ export default function AbsenceStats() {
     const loadStats = async () => {
       setLoading(true);
       try {
-        // Total
-        const { count: total, error: totalError } = await supabase
-          .from("demande_absence")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", user.id);
-        if (totalError) throw totalError;
+        // Si l'utilisateur est admin, charger uniquement le nombre de demandes en attente
+        if (user.role === "admin") {
+          const { count: pendingCount, error: pendingError } = await supabase
+            .from("demande_absence")
+            .select("*", { count: "exact", head: true })
+            .eq("statut", "et");
+          
+          if (pendingError) throw pendingError;
+          setAdminPendingCount(pendingCount ?? 0);
+        } else {
+          // Pour les utilisateurs normaux, charger toutes les statistiques
+          // Total
+          const { count: total, error: totalError } = await supabase
+            .from("demande_absence")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", user.id);
+          if (totalError) throw totalError;
 
-        // Pending (en attente)
-        const { count: pending, error: pendingError } = await supabase
-          .from("demande_absence")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", user.id)
-          .eq("statut", "et");
-        if (pendingError) throw pendingError;
+          // Pending (en attente)
+          const { count: pending, error: pendingError } = await supabase
+            .from("demande_absence")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .eq("statut", "et");
+          if (pendingError) throw pendingError;
 
-        // Accepted
-        const { count: accepted, error: acceptedError } = await supabase
-          .from("demande_absence")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", user.id)
-          .eq("statut", "acc");
-        if (acceptedError) throw acceptedError;
+          // Accepted
+          const { count: accepted, error: acceptedError } = await supabase
+            .from("demande_absence")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .eq("statut", "acc");
+          if (acceptedError) throw acceptedError;
 
-        // Refused
-        const { count: refused, error: refusedError } = await supabase
-          .from("demande_absence")
-          .select("*", { count: "exact", head: true })
-          .eq("user_id", user.id)
-          .eq("statut", "rf");
-        if (refusedError) throw refusedError;
+          // Refused
+          const { count: refused, error: refusedError } = await supabase
+            .from("demande_absence")
+            .select("*", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .eq("statut", "rf");
+          if (refusedError) throw refusedError;
 
-        setStats({ 
-          total: total ?? 0, 
-          pending: pending ?? 0, 
-          accepted: accepted ?? 0, 
-          refused: refused ?? 0 
-        });
+          setStats({ 
+            total: total ?? 0, 
+            pending: pending ?? 0, 
+            accepted: accepted ?? 0, 
+            refused: refused ?? 0 
+          });
+        }
       } catch (error: any) {
         console.error("Erreur lors du chargement des stats :", error.message);
-        setStats({ total: 0, pending: 0, accepted: 0, refused: 0 });
+        if (user.role === "admin") {
+          setAdminPendingCount(0);
+        } else {
+          setStats({ total: 0, pending: 0, accepted: 0, refused: 0 });
+        }
       } finally {
         setLoading(false);
       }
@@ -103,12 +120,31 @@ export default function AbsenceStats() {
             </TouchableOpacity>
           </View>
         ) : user.role === "admin" ? (
-          // Affichage pour les admins (pas de statistiques)
-          <View style={styles.welcomeCard}>
-            <Text style={styles.welcomeEmoji}>👋</Text>
-            <Text style={styles.title}>Bienvenue Administrateur</Text>
-            <Text style={styles.subtitle}>Système de gestion des demandes d'absence</Text>
-          </View>
+          // Affichage pour les admins (avec nombre de demandes en attente)
+          <>
+            <View style={styles.welcomeCard}>
+              <Text style={styles.welcomeEmoji}>👋</Text>
+              <Text style={styles.title}>Bienvenue Administrateur</Text>
+              <Text style={styles.subtitle}>Système de gestion des demandes d'absence</Text>
+            </View>
+
+            <View style={styles.statsBubble}>
+              <Text style={styles.statsTitle}>📋 Demandes en attente</Text>
+
+              {loading ? (
+                <ActivityIndicator size="large" color="#6366f1" />
+              ) : (
+                <View style={styles.adminStatContainer}>
+                  <Text style={styles.adminStatNumber}>{adminPendingCount}</Text>
+                  <Text style={styles.adminStatLabel}>
+                    {adminPendingCount === 0 ? 'Aucune demande en attente' : 
+                     adminPendingCount === 1 ? 'Demande à traiter' : 
+                     'Demandes à traiter'}
+                  </Text>
+                </View>
+              )}
+            </View>
+          </>
         ) : (
           // Affichage pour les utilisateurs normaux
           <>
@@ -292,5 +328,21 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: "700",
     letterSpacing: 0.3,
+  },
+  adminStatContainer: {
+    alignItems: "center",
+    padding: 24,
+  },
+  adminStatNumber: {
+    fontSize: 64,
+    fontWeight: "800",
+    color: "#6366f1",
+    marginBottom: 12,
+  },
+  adminStatLabel: {
+    fontSize: 16,
+    color: "#64748b",
+    fontWeight: "600",
+    textAlign: "center",
   },
 });

@@ -64,6 +64,13 @@ export default function MyRequest() {
           classe: item.classe
         }));
         
+        // Trier par date d'absence (plus récente en premier)
+        transformedData.sort((a, b) => {
+          const dateA = new Date(a.absence_date).getTime();
+          const dateB = new Date(b.absence_date).getTime();
+          return dateB - dateA; // Ordre décroissant (plus récent en premier)
+        });
+        
         setDemandes(transformedData);
       }
     } catch (error: any) {

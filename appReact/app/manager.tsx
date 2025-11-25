@@ -21,24 +21,47 @@ export default function Manager() {
         console.error(error);
         setErrorMsg(error.message);
       } else {
-        const flat = (data || []).map((d) => ({
-          id_absence: d.id_absence,
-          nom: d.nom,
-          prenom: d.prenom,
-          email: d.email,
-          role: d.role,
-          du: d.absence_date,
-          au: d.absence_dateFin,
-          raison: d.raison,
-          statut: d.statut,
-          date_remplacement: d.date_remplacement,
-          heure_remplacement_deb: d.heure_remplacement_deb,
-          heure_remplacement_fin: d.heure_remplacement_fin,
-          salle_remplacement: d.salle_remplacement,
-          classe: d.classe,
-          commentaire: d.commentaire,
-        }));
-        setRows(flat);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0); // Réinitialiser l'heure à minuit pour comparer seulement les dates
+
+        // Traiter les demandes et refuser automatiquement celles dont la date est passée ou aujourd'hui
+        const processedData = await Promise.all(
+          (data || []).map(async (d) => {
+            const absenceDate = new Date(d.absence_date);
+            absenceDate.setHours(0, 0, 0, 0);
+
+            // Si la date de début est aujourd'hui ou dans le passé, refuser automatiquement
+            if (absenceDate <= today) {
+              await supabase
+                .from("demande_absence")
+                .update({ statut: "rf" })
+                .eq("id_absence", d.id_absence);
+              
+              return null; // Ne pas inclure dans la liste
+            }
+
+            return {
+              id_absence: d.id_absence,
+              nom: d.nom,
+              prenom: d.prenom,
+              email: d.email,
+              role: d.role,
+              du: d.absence_date,
+              au: d.absence_dateFin,
+              raison: d.raison,
+              statut: d.statut,
+              date_remplacement: d.date_remplacement,
+              heure_remplacement_deb: d.heure_remplacement_deb,
+              heure_remplacement_fin: d.heure_remplacement_fin,
+              salle_remplacement: d.salle_remplacement,
+              classe: d.classe,
+              commentaire: d.commentaire,
+            };
+          })
+        );
+
+        // Filtrer les demandes refusées automatiquement (null)
+        setRows(processedData.filter(item => item !== null));
       }
       setLoading(false);
     }
