@@ -28,9 +28,57 @@ export default function InscriptionScreen() {
     return selectedRole ? selectedRole.label : "Sélectionnez un rôle";
   };
 
+  const isValidPassword = (password: string): boolean => {
+    // Minimum 12 caractères
+    if (password.length < 12) return false;
+    
+    // Au moins une lettre minuscule
+    if (!/[a-z]/.test(password)) return false;
+    
+    // Au moins une lettre majuscule
+    if (!/[A-Z]/.test(password)) return false;
+    
+    // Au moins un chiffre
+    if (!/[0-9]/.test(password)) return false;
+    
+    // Au moins un caractère spécial
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) return false;
+    
+    return true;
+  };
+
+  const isValidEmail = (email: string): boolean => {
+    // Regex pour valider le format email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+  };
+
   const handleSignup = async () => {
     if (!nom || !prenom || !email || !password || !role) {
       Alert.alert("Erreur", "Veuillez remplir tous les champs.");
+      return;
+    }
+
+    // Validation de l'adresse email
+    if (!isValidEmail(email)) {
+      Alert.alert(
+        "Email invalide",
+        "Veuillez saisir une adresse email valide (ex: nom@domaine.com)"
+      );
+      return;
+    }
+
+    // Validation du mot de passe
+    if (!isValidPassword(password)) {
+      Alert.alert(
+        "Mot de passe invalide",
+        "Le mot de passe doit contenir :\n" +
+        "• Au minimum 12 caractères\n" +
+        "• Au moins une lettre minuscule\n" +
+        "• Au moins une lettre majuscule\n" +
+        "• Au moins un chiffre\n" +
+        "• Au moins un caractère spécial (!@#$%^&*...)"
+      );
       return;
     }
 
