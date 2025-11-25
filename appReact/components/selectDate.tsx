@@ -50,9 +50,9 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
   };
 
   const handleDatePress = (date: Date) => {
-    // Empêcher la sélection des dates passées et des weekends
-    if (isPastDate(date)) {
-      Alert.alert('Date invalide', 'Vous ne pouvez pas sélectionner une date dépassée.');
+    // Empêcher la sélection des dates passées, d'aujourd'hui et des weekends
+    if (isPastOrTodayDate(date)) {
+      Alert.alert('Date invalide', 'Vous ne pouvez pas sélectionner une date passée ou la date d\'aujourd\'hui.');
       return;
     }
     if (isWeekend(date)) {
@@ -98,6 +98,14 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
     const compareDate = new Date(date);
     compareDate.setHours(0, 0, 0, 0);
     return compareDate < today;
+  };
+
+  const isPastOrTodayDate = (date: Date) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Réinitialiser l'heure pour ne comparer que les dates
+    const compareDate = new Date(date);
+    compareDate.setHours(0, 0, 0, 0);
+    return compareDate <= today; // <= pour inclure aujourd'hui
   };
 
   const isWeekend = (date: Date) => {
@@ -180,17 +188,17 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
                   date && isDateInRange(date) && styles.selectedCell,
                   date && isStartDate(date) && styles.startDateCell,
                   date && isEndDate(date) && styles.endDateCell,
-                  date && isPastDate(date) && styles.pastDateCell,
+                  date && isPastOrTodayDate(date) && styles.pastDateCell,
                   date && isWeekend(date) && styles.weekendCell,
                 ]}
                 onPress={() => date && handleDatePress(date)}
-                disabled={!date || (date && (isPastDate(date) || isWeekend(date)))}
+                disabled={!date || (date && (isPastOrTodayDate(date) || isWeekend(date)))}
               >
                 <Text
                   style={[
                     styles.dayText,
                     date && isDateInRange(date) && styles.selectedText,
-                    date && isPastDate(date) && styles.pastDateText,
+                    date && isPastOrTodayDate(date) && styles.pastDateText,
                     date && isWeekend(date) && styles.weekendText,
                   ]}
                 >
