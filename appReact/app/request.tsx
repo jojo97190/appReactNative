@@ -35,8 +35,88 @@ export default function Request() {
   };
 
   const handleReplacementDateSelect = (date: Date) => {
+    // Vérifier que la date est après la date de fin de l'absence
+    if (endDate) {
+      const selectedDateOnly = new Date(date.toISOString().split('T')[0]);
+      const endDateOnly = new Date(endDate.toISOString().split('T')[0]);
+      
+      if (selectedDateOnly <= endDateOnly) {
+        Alert.alert(
+          "Date invalide",
+          "La date de remplacement doit être après la date de fin de l'absence"
+        );
+        return;
+      }
+    }
+    
     setReplacementDate(date);
     setShowReplacementCalendar(false);
+    Alert.alert(
+      "Date validée",
+      `Date de remplacement : ${date.toLocaleDateString('fr-FR')}`
+    );
+  };
+
+  const handleStartTimeSelect = (time: string) => {
+    // Si l'heure de fin est déjà définie, vérifier la cohérence
+    if (replacementEndTime) {
+      const [startHour, startMinute] = time.split(':').map(Number);
+      const [endHour, endMinute] = replacementEndTime.split(':').map(Number);
+      
+      const startTimeInMinutes = startHour * 60 + startMinute;
+      const endTimeInMinutes = endHour * 60 + endMinute;
+      const durationInMinutes = endTimeInMinutes - startTimeInMinutes;
+      
+      if (endTimeInMinutes <= startTimeInMinutes) {
+        Alert.alert(
+          "Horaire invalide",
+          "L'heure de début doit être avant l'heure de fin"
+        );
+        return;
+      }
+      
+      if (durationInMinutes < 60) {
+        Alert.alert(
+          "Durée insuffisante",
+          "La durée de remplacement doit être d'au moins 1 heure"
+        );
+        return;
+      }
+    }
+    
+    setReplacementStartTime(time);
+    setShowStartTimeSelector(false);
+  };
+
+  const handleEndTimeSelect = (time: string) => {
+    // Si l'heure de début est déjà définie, vérifier la cohérence
+    if (replacementStartTime) {
+      const [startHour, startMinute] = replacementStartTime.split(':').map(Number);
+      const [endHour, endMinute] = time.split(':').map(Number);
+      
+      const startTimeInMinutes = startHour * 60 + startMinute;
+      const endTimeInMinutes = endHour * 60 + endMinute;
+      const durationInMinutes = endTimeInMinutes - startTimeInMinutes;
+      
+      if (endTimeInMinutes <= startTimeInMinutes) {
+        Alert.alert(
+          "Horaire invalide",
+          "L'heure de fin doit être après l'heure de début"
+        );
+        return;
+      }
+      
+      if (durationInMinutes < 60) {
+        Alert.alert(
+          "Durée insuffisante",
+          "La durée de remplacement doit être d'au moins 1 heure"
+        );
+        return;
+      }
+    }
+    
+    setReplacementEndTime(time);
+    setShowEndTimeSelector(false);
   };
 
   const handleSubmit = async () => {
@@ -50,7 +130,21 @@ export default function Request() {
         return;
       }
 
-      // Vérifier que l'heure de fin est après l'heure de début
+      // Vérifier que la date de remplacement est après la date de fin de l'absence
+      if (hasReplacement && replacementDate && endDate) {
+        const replacementDateOnly = new Date(replacementDate.toISOString().split('T')[0]);
+        const endDateOnly = new Date(endDate.toISOString().split('T')[0]);
+        
+        if (replacementDateOnly <= endDateOnly) {
+          Alert.alert(
+            "Date invalide",
+            "La date de remplacement doit être après la date de fin de l'absence"
+          );
+          return;
+        }
+      }
+
+      // Vérifier que l'heure de fin est après l'heure de début et durée minimale d'1h
       if (hasReplacement && replacementStartTime && replacementEndTime) {
         const [startHour, startMinute] = replacementStartTime.split(':').map(Number);
         const [endHour, endMinute] = replacementEndTime.split(':').map(Number);
@@ -62,6 +156,16 @@ export default function Request() {
           Alert.alert(
             "Horaire invalide",
             "L'heure de fin doit être après l'heure de début"
+          );
+          return;
+        }
+
+        // Vérifier la durée minimale d'1 heure (60 minutes)
+        const durationInMinutes = endTimeInMinutes - startTimeInMinutes;
+        if (durationInMinutes < 60) {
+          Alert.alert(
+            "Durée insuffisante",
+            "La durée de remplacement doit être d'au moins 1 heure"
           );
           return;
         }
@@ -256,7 +360,7 @@ export default function Request() {
       <TimeSelector
         visible={showStartTimeSelector}
         onClose={() => setShowStartTimeSelector(false)}
-        onSelectTime={setReplacementStartTime}
+        onSelectTime={handleStartTimeSelect}
         selectedTime={replacementStartTime}
         title="Heure de début"
       />
@@ -264,7 +368,7 @@ export default function Request() {
       <TimeSelector
         visible={showEndTimeSelector}
         onClose={() => setShowEndTimeSelector(false)}
-        onSelectTime={setReplacementEndTime}
+        onSelectTime={handleEndTimeSelect}
         selectedTime={replacementEndTime}
         title="Heure de fin"
       />
