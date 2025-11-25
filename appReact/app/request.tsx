@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Text, TextInput, View, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, ScrollView } from "react-native";
+import { Text, TextInput, View, StyleSheet, Alert, ActivityIndicator, TouchableOpacity, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import NavBar from "../components/NavBar";
 import DateSelector from "../components/selectDate";
 import SingleDateSelector from "../components/selectSingleDate";
@@ -116,11 +116,15 @@ export default function Request() {
   };
   
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={0}
+    >
       <View style={styles.header}>
         <NavBar />
       </View>
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps="handled">
         <View style={styles.content}>
           <Text style={styles.title}>Nouvelle Demande</Text>
           <DateSelector onDateRangeSelect={handleDateRangeSelect} />
@@ -247,7 +251,7 @@ export default function Request() {
         selectedTime={replacementEndTime}
         title="Heure de fin"
       />
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

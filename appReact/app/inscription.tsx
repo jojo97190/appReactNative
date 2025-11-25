@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Modal, ScrollView } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Modal, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { supabase } from "./supabase.js";
 import { useRouter } from "expo-router";
 
@@ -74,30 +74,38 @@ export default function InscriptionScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Inscription</Text>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={0}
+    >
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={styles.title}>Inscription</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Nom"
-        placeholderTextColor="#aaa"
-        value={nom}
-        onChangeText={setNom}
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Nom"
+          placeholderTextColor="#aaa"
+          value={nom}
+          onChangeText={setNom}
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Prénom"
-        placeholderTextColor="#aaa"
-        value={prenom}
-        onChangeText={setPrenom}
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Prénom"
+          placeholderTextColor="#aaa"
+          value={prenom}
+          onChangeText={setPrenom}
+        />
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#aaa"
-        keyboardType="email-address"
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#aaa"
+          keyboardType="email-address"
         autoCapitalize="none"
         value={email}
         onChangeText={setEmail}
@@ -178,16 +186,20 @@ export default function InscriptionScreen() {
       >
         <Text style={styles.buttonText}>Déjà un compte ? Se connecter</Text>
       </TouchableOpacity>
-    </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f0f4f8",
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f0f4f8",
     padding: 24,
   },
   title: {
