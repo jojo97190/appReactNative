@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200">
+  <!-- Fond blanc -->
+  <rect width="200" height="200" fill="white"/>
+  
+  <!-- Drapeau tricolore -->
+  <rect x="50" y="30" width="30" height="60" fill="#002395"/>
+  <rect x="80" y="30" width="30" height="60" fill="white"/>
+  <rect x="110" y="30" width="30" height="60" fill="#ED2939"/>
+  
+  <!-- Texte -->
+  <text x="100" y="110" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#002395">RÉPUBLIQUE</text>
+  <text x="100" y="130" font-family="Arial, sans-serif" font-size="14" font-weight="bold" text-anchor="middle" fill="#002395">FRANÇAISE</text>
+  
+  <!-- Devise -->
+  <text x="100" y="155" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#333">Liberté</text>
+  <text x="100" y="170" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#333">Égalité</text>
+  <text x="100" y="185" font-family="Arial, sans-serif" font-size="10" text-anchor="middle" fill="#333">Fraternité</text>
+</svg>

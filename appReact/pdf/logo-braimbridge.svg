@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="300" height="120" viewBox="0 0 300 120">
+  <!-- Fond -->
+  <rect width="300" height="120" fill="white"/>
+  
+  <!-- Logo stylisé Braimbridge -->
+  <circle cx="60" cy="60" r="40" fill="#0066cc" opacity="0.8"/>
+  <circle cx="60" cy="60" r="25" fill="white"/>
+  
+  <!-- Texte Braimbridge -->
+  <text x="120" y="50" font-family="'Brush Script MT', cursive" font-size="36" fill="#e63946" font-style="italic">Braimbridge</text>
+  
+  <!-- Sous-titre -->
+  <text x="120" y="75" font-family="Arial, sans-serif" font-size="12" fill="#0066cc">Saint-Claude • Guadeloupe</text>
+  
+  <!-- Ligne décorative -->
+  <line x1="120" y1="85" x2="280" y2="85" stroke="#0066cc" stroke-width="2"/>
+</svg>

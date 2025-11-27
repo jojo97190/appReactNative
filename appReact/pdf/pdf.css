@@ -1,0 +1,221 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f5f5f5;
+    padding: 20px;
+}
+
+.page {
+    max-width: 210mm;
+    min-height: 297mm;
+    background: white;
+    margin: 0 auto;
+    padding: 20px 30px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* En-tête */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ccc;
+}
+
+.logo-left, .logo-right {
+    flex: 0 0 120px;
+}
+
+.logo-rf {
+    width: 80px;
+    height: auto;
+}
+
+.logo-braimbridge {
+    width: 120px;
+    height: auto;
+}
+
+.header-center {
+    flex: 1;
+    text-align: center;
+    padding: 0 20px;
+}
+
+.school-name {
+    font-size: 14px;
+    font-weight: bold;
+    color: #003366;
+    line-height: 1.4;
+}
+
+/* Titres */
+.section-title {
+    text-align: center;
+    color: #6b9bd1;
+    font-size: 16px;
+    font-weight: bold;
+    margin: 15px 0;
+}
+
+h1 {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    margin: 15px 0 5px 0;
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 12px;
+    margin-bottom: 20px;
+}
+
+/* Cases à cocher */
+.checkbox-group {
+    margin: 20px 0;
+}
+
+.checkbox-item {
+    display: flex;
+    align-items: center;
+    margin: 8px 0;
+}
+
+.checkbox-item input[type="checkbox"] {
+    margin-right: 10px;
+    width: 16px;
+    height: 16px;
+}
+
+.checkbox-item label {
+    font-size: 13px;
+}
+
+/* Champs de formulaire */
+.form-field {
+    display: flex;
+    align-items: baseline;
+    margin: 12px 0;
+    font-size: 13px;
+}
+
+.form-field label {
+    margin-right: 10px;
+    white-space: nowrap;
+}
+
+.dotted-line {
+    flex: 1;
+    border-bottom: 1px dotted #000;
+    height: 1px;
+    margin: 0 5px;
+}
+
+.form-row {
+    display: flex;
+    align-items: baseline;
+    margin: 10px 0;
+    font-size: 13px;
+}
+
+.form-row span {
+    margin: 0 3px;
+}
+
+.dotted-inline {
+    display: inline-block;
+    border-bottom: 1px dotted #000;
+    width: 80px;
+    height: 1px;
+    margin: 0 3px;
+}
+
+.dotted-inline-long {
+    display: inline-block;
+    border-bottom: 1px dotted #000;
+    width: 200px;
+    height: 1px;
+    margin: 0 3px;
+}
+
+/* Sections avec bordure */
+.bordered-section {
+    border: 2px solid #000;
+    padding: 15px;
+    margin: 20px 0;
+    position: relative;
+}
+
+.bordered-section legend {
+    font-weight: bold;
+    font-size: 14px;
+    padding: 0 10px;
+}
+
+/* Footer avec signatures */
+.footer-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    gap: 15px;
+}
+
+.signature-box {
+    flex: 1;
+    min-width: 150px;
+}
+
+.signature-label {
+    font-size: 12px;
+    margin-bottom: 5px;
+    font-weight: normal;
+}
+
+.signature-content {
+    font-size: 12px;
+    margin: 10px 0;
+}
+
+.signature-date {
+    font-size: 12px;
+    margin: 5px 0;
+}
+
+.signature-name {
+    font-size: 12px;
+    margin-top: 40px;
+    text-align: right;
+}
+
+/* Impression */
+@media print {
+    body {
+        padding: 0;
+        background: white;
+    }
+    
+    .page {
+        box-shadow: none;
+        margin: 0;
+        padding: 15mm 20mm;
+    }
+}
+
+/* Images placeholder si non disponibles */
+img {
+    display: block;
+}
+
+img[src="republique-francaise.png"],
+img[src="logo-braimbridge.png"] {
+    background-color: #f0f0f0;
+    border: 1px dashed #ccc;
+}

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volet Intéressé(e) - Absence</title>
+    <link rel="stylesheet" href="pdf.css">
+</head>
+<body>
+    <div class="page">
+        <!-- En-tête -->
+        <header class="header">
+            <div class="logo-left">
+                <img src="republique-francaise.svg" alt="République Française" class="logo-rf">
+            </div>
+            <div class="header-center">
+                <div class="school-name">Lycée Général et Technologique</div>
+                <div class="school-name">Braimbridge</div>
+            </div>
+            <div class="logo-right">
+                <img src="logo-braimbridge.svg" alt="Braimbridge" class="logo-braimbridge">
+            </div>
+        </header>
+
+        <div class="section-title">Enseignement et Éducation</div>
+        
+        <h1>VOLET INTÉRESSÉ(E)</h1>
+        <p class="subtitle">Merci de remplir le volet</p>
+
+        <!-- Type de demande -->
+        <div class="checkbox-group">
+            <div class="checkbox-item">
+                <input type="checkbox" id="demande">
+                <label for="demande">Demande d'autorisation d'absence</label>
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="regularisation">
+                <label for="regularisation">Régularisation d'absence</label>
+            </div>
+            <div class="checkbox-item">
+                <input type="checkbox" id="signalement">
+                <label for="signalement">Signalement d'absence</label>
+            </div>
+        </div>
+
+        <!-- Informations personnelles -->
+        <div class="form-field">
+            <label>Nom Prénom :</label>
+            <div class="dotted-line"></div>
+        </div>
+        <div class="form-field">
+            <label>Grade :</label>
+            <div class="dotted-line"></div>
+        </div>
+
+        <!-- Section Absence -->
+        <fieldset class="bordered-section">
+            <legend>Absence</legend>
+            <div class="form-row">
+                <span>- Le</span>
+                <span class="dotted-inline"></span>
+                <span>de</span>
+                <span class="dotted-inline"></span>
+                <span>h</span>
+                <span class="dotted-inline"></span>
+                <span>à</span>
+                <span class="dotted-inline"></span>
+                <span>h</span>
+                <span class="dotted-inline"></span>
+            </div>
+            <div class="form-row">
+                <span>- Du</span>
+                <span class="dotted-inline-long"></span>
+                <span>au</span>
+                <span class="dotted-inline-long"></span>
+            </div>
+            <div class="form-field">
+                <label>Reprise le</label>
+                <div class="dotted-line"></div>
+            </div>
+            <div class="form-field">
+                <label>Motif :</label>
+                <div class="dotted-line"></div>
+            </div>
+            <div class="form-field">
+                <label>Pièces justificatives jointes :</label>
+                <div class="dotted-line"></div>
+            </div>
+        </fieldset>
+
+        <!-- Section Remplacement -->
+        <fieldset class="bordered-section">
+            <legend>Proposition de remplacement</legend>
+            <div class="form-field">
+                <label>Préciser les dates, heures, classes et salles :</label>
+                <div class="dotted-line"></div>
+            </div>
+            <div class="dotted-line"></div>
+        </fieldset>
+
+        <!-- Footer avec signatures -->
+        <div class="footer-section">
+            <div class="signature-box">
+                <div class="signature-label">Date et signature de</div>
+                <div class="signature-label">l'intéressé(e) :</div>
+                <div class="signature-content">Abymes,</div>
+                <div class="signature-date">Le ... / ... /202....</div>
+            </div>
+
+            <div class="signature-box">
+                <div class="signature-label">Avis du Proviseur</div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="accordee">
+                    <label for="accordee">Accordée</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="refusee">
+                    <label for="refusee">Refusée</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="reservee">
+                    <label for="reservee">Réservée</label>
+                </div>
+            </div>
+
+            <div class="signature-box">
+                <div class="signature-content">Abymes,</div>
+                <div class="signature-date">Le ... / ... /202....</div>
+                <div class="signature-label">Le Proviseur</div>
+                <div class="signature-name">Marius CLAUDE</div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
