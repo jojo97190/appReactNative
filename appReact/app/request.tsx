@@ -41,6 +41,8 @@ export default function Request() {
   
   type User = {
     id: string;
+    nom?: string;
+    prenom?: string;
   };
 
   const { user } = useUserContext() as { user: User };
@@ -112,17 +114,34 @@ export default function Request() {
   const uploadAttachments = async (demandeId: number): Promise<string[]> => {
     const uploadedUrls: string[] = [];
 
-    for (const attachment of attachments) {
+    // Récupérer les informations de l'utilisateur depuis la base de données
+    const { data: userData, error: userError } = await supabase
+      .from('utilisateurtest')
+      .select('nom, prenom')
+      .eq('id_utilisateur', user.id)
+      .single();
+
+    if (userError) {
+      console.error('Erreur récupération utilisateur:', userError);
+      return uploadedUrls;
+    }
+
+    const userFolderName = `${userData.nom}_${userData.prenom}`.replace(/\s+/g, '_');
+
+    for (let index = 0; index < attachments.length; index++) {
+      const attachment = attachments[index];
       try {
         // Lire le fichier
         const response = await fetch(attachment.uri);
         const arrayBuffer = await response.arrayBuffer();
         const fileData = new Uint8Array(arrayBuffer);
         
-        // Créer un nom de fichier unique
+        // Créer un nom de fichier reconnaissable
         const fileExt = attachment.name.split('.').pop();
-        const fileName = `${demandeId}_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-        const filePath = `demande-pieces-jointes/${fileName}`;
+        const originalName = attachment.name.replace(/\.[^/.]+$/, ""); // Nom sans extension
+        const timestamp = new Date().toISOString().split('T')[0]; // Format: YYYY-MM-DD
+        const fileName = `demande_${demandeId}_${originalName}_${timestamp}_${index + 1}.${fileExt}`;
+        const filePath = `demande-pieces-jointes/${userFolderName}/${fileName}`;
 
         // Upload vers Supabase Storage
         const { data, error } = await supabase.storage
