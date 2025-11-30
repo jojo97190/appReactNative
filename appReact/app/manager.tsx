@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { ActivityIndicator, FlatList, Pressable, ScrollView, StyleSheet, Text, View, TouchableOpacity, Linking } from "react-native";
 import NavBar from "../components/NavBar";
 import {supabase} from './supabase.js';
 
@@ -13,7 +13,7 @@ export default function Manager() {
     async function fetchData() {
       const { data, error } = await supabase
         .from("user_demandes")
-        .select("*")
+        .select("*, pieces_jointes")
         .eq("statut", "et")
         .order("absence_date", { ascending: false });
 
@@ -56,6 +56,7 @@ export default function Manager() {
               salle_remplacement: d.salle_remplacement,
               classe: d.classe,
               commentaire: d.commentaire,
+              pieces_jointes: d.pieces_jointes || [],
             };
           })
         );
@@ -219,6 +220,45 @@ export default function Manager() {
                   </Text>
                 </View>
               )}
+            </View>
+          )}
+
+          {/* Section Pièces jointes */}
+          {item.pieces_jointes && item.pieces_jointes.length > 0 && (
+            <View style={styles.attachmentsSection}>
+              <Text style={styles.attachmentsTitle}>📎 Pièces jointes</Text>
+              {item.pieces_jointes.map((url: string, index: number) => {
+                const fileName = url.split('/').pop() || `Fichier ${index + 1}`;
+                const isImage = /\.(jpg|jpeg|png|gif|bmp|webp)$/i.test(fileName);
+                const isPdf = /\.pdf$/i.test(fileName);
+                
+                return (
+                  <View key={index} style={styles.attachmentItem}>
+                    <View style={styles.attachmentInfo}>
+                      <Text style={styles.attachmentIcon}>
+                        {isPdf ? '📄' : isImage ? '🖼️' : '📁'}
+                      </Text>
+                      <Text style={styles.attachmentName} numberOfLines={1}>
+                        {decodeURIComponent(fileName)}
+                      </Text>
+                    </View>
+                    <View style={styles.attachmentActions}>
+                      <TouchableOpacity
+                        style={styles.viewButton}
+                        onPress={() => Linking.openURL(url)}
+                      >
+                        <Text style={styles.viewButtonText}>👁️</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.downloadButton}
+                        onPress={() => Linking.openURL(url)}
+                      >
+                        <Text style={styles.downloadButtonText}>⬇️</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                );
+              })}
             </View>
           )}
         </View>
@@ -481,6 +521,83 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#1e293b",
     fontWeight: "600",
+  },
+
+  attachmentsSection: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#e2e8f0",
+  },
+
+  attachmentsTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#6366f1",
+    marginBottom: 12,
+    letterSpacing: -0.3,
+  },
+
+  attachmentItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#f8fafc",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+  },
+
+  attachmentInfo: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    marginRight: 12,
+  },
+
+  attachmentIcon: {
+    fontSize: 20,
+    marginRight: 10,
+  },
+
+  attachmentName: {
+    flex: 1,
+    fontSize: 14,
+    color: "#1e293b",
+    fontWeight: "500",
+  },
+
+  attachmentActions: {
+    flexDirection: "row",
+    gap: 8,
+  },
+
+  viewButton: {
+    backgroundColor: "#3b82f6",
+    borderRadius: 8,
+    width: 36,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  viewButtonText: {
+    fontSize: 18,
+  },
+
+  downloadButton: {
+    backgroundColor: "#10b981",
+    borderRadius: 8,
+    width: 36,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  downloadButtonText: {
+    fontSize: 18,
   },
 });
 
