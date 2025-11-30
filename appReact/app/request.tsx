@@ -10,6 +10,9 @@ import { useUserContext } from "./usercontext";
 
 export default function Request() {
   const [motif, setMotif] = useState("");
+  const [selectedMotif, setSelectedMotif] = useState("");
+  const [customMotif, setCustomMotif] = useState("");
+  const [showMotifSelector, setShowMotifSelector] = useState(false);
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -23,11 +26,33 @@ export default function Request() {
   const [showStartTimeSelector, setShowStartTimeSelector] = useState(false);
   const [showEndTimeSelector, setShowEndTimeSelector] = useState(false);
   
+  const motifsPossibles = [
+    "Maladie",
+    "Congé parental",
+    "Formation professionnelle",
+    "Rendez-vous médical",
+    "Événement familial",
+    "Obligations personnelles",
+    "Autre"
+  ];
+  
   type User = {
     id: string;
   };
 
   const { user } = useUserContext() as { user: User };
+  
+  const handleMotifSelect = (selectedMotif: string) => {
+    setSelectedMotif(selectedMotif);
+    if (selectedMotif === "Autre") {
+      setMotif("");
+      setCustomMotif("");
+    } else {
+      setMotif(selectedMotif);
+      setCustomMotif("");
+    }
+    setShowMotifSelector(false);
+  };
   
   const handleDateRangeSelect = (start: Date, end: Date) => {
     setStartDate(start);
@@ -120,7 +145,17 @@ export default function Request() {
   };
 
   const handleSubmit = async () => {
-    if (startDate && endDate && motif) {
+    const finalMotif = selectedMotif === "Autre" ? customMotif.trim() : motif;
+    
+    if (!finalMotif) {
+      Alert.alert(
+        "Champs incomplets",
+        "Veuillez sélectionner ou saisir un motif"
+      );
+      return;
+    }
+    
+    if (startDate && endDate && finalMotif) {
       // Vérifier les champs de remplacement si nécessaire
       if (hasReplacement && (!replacementDate || !replacementStartTime || !replacementEndTime || !replacementRoom || !replacementClass)) {
         Alert.alert(
@@ -186,7 +221,7 @@ export default function Request() {
           absence_date: startDate.toISOString().split('T')[0],
           absence_dateFin: endDate.toISOString().split('T')[0],
           statut: 'et' as const,
-          raison: motif.trim(),
+          raison: finalMotif,
           commentaire: null,
           date_creation: now,
           date_maj: now
@@ -208,6 +243,8 @@ export default function Request() {
             text: "OK", 
             onPress: () => {
               setMotif("");
+              setSelectedMotif("");
+              setCustomMotif("");
               setStartDate(null);
               setEndDate(null);
               setHasReplacement(false);
@@ -251,12 +288,56 @@ export default function Request() {
           <DateSelector onDateRangeSelect={handleDateRangeSelect} />
 
           <Text style={styles.label}>Motif :</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Entrez le motif"
-            value={motif}
-            onChangeText={setMotif}
-          />
+          <TouchableOpacity
+            style={styles.motifPickerButton}
+            onPress={() => setShowMotifSelector(!showMotifSelector)}
+          >
+            <Text style={selectedMotif ? styles.motifPickerButtonTextSelected : styles.motifPickerButtonText}>
+              {selectedMotif || "Sélectionner un motif"}
+            </Text>
+            <Text style={styles.motifPickerIcon}>▼</Text>
+          </TouchableOpacity>
+
+          {showMotifSelector && (
+            <View style={styles.motifList}>
+              {motifsPossibles.map((motifOption) => (
+                <TouchableOpacity
+                  key={motifOption}
+                  style={[
+                    styles.motifItem,
+                    selectedMotif === motifOption && styles.motifItemSelected
+                  ]}
+                  onPress={() => handleMotifSelect(motifOption)}
+                >
+                  <Text style={[
+                    styles.motifItemText,
+                    selectedMotif === motifOption && styles.motifItemTextSelected
+                  ]}>
+                    {motifOption}
+                  </Text>
+                  {selectedMotif === motifOption && (
+                    <Text style={styles.checkIcon}>✓</Text>
+                  )}
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+
+          {selectedMotif === "Autre" && (
+            <View style={styles.customMotifContainer}>
+              <Text style={styles.label}>Précisez le motif :</Text>
+              <TextInput
+                style={styles.input}
+                placeholder="Entrez le motif"
+                value={customMotif}
+                onChangeText={(text) => {
+                  setCustomMotif(text);
+                  setMotif(text);
+                }}
+                multiline
+              />
+            </View>
+          )}
 
           {/* Section Remplacement */}
           <View style={styles.replacementSection}>
@@ -525,5 +606,78 @@ const styles = StyleSheet.create({
   },
   datePickerIcon: {
     fontSize: 20,
+  },
+  motifPickerButton: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    minHeight: 56,
+    borderColor: "#e2e8f0",
+    borderWidth: 2,
+    borderRadius: 12,
+    paddingHorizontal: 18,
+    marginBottom: 20,
+    backgroundColor: "#ffffff",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  motifPickerButtonText: {
+    fontSize: 16,
+    color: "#94a3b8",
+  },
+  motifPickerButtonTextSelected: {
+    fontSize: 16,
+    color: "#1e293b",
+  },
+  motifPickerIcon: {
+    fontSize: 14,
+    color: "#64748b",
+  },
+  motifList: {
+    backgroundColor: "#ffffff",
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: "#e2e8f0",
+    marginTop: -12,
+    marginBottom: 20,
+    overflow: "hidden",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  motifItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingHorizontal: 18,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f1f5f9",
+  },
+  motifItemSelected: {
+    backgroundColor: "#f0f4f8",
+  },
+  motifItemText: {
+    fontSize: 16,
+    color: "#1e293b",
+  },
+  motifItemTextSelected: {
+    fontSize: 16,
+    color: "#6366f1",
+    fontWeight: "600",
+  },
+  checkIcon: {
+    fontSize: 18,
+    color: "#6366f1",
+    fontWeight: "700",
+  },
+  customMotifContainer: {
+    marginTop: -12,
+    marginBottom: 20,
   },
 });
