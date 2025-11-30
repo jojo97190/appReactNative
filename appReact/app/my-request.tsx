@@ -1,4 +1,4 @@
-import { Text, View, StyleSheet, ScrollView, ActivityIndicator } from "react-native";
+import { Text, View, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Linking } from "react-native";
 import React, { useEffect, useState } from "react";
 import NavBar from "../components/NavBar";
 import LoginBubble from "../components/LoginBubble";
@@ -39,7 +39,8 @@ export default function MyRequest() {
           heure_remplacement_deb,
           heure_remplacement_fin,
           salle_remplacement,
-          classe
+          classe,
+          pieces_jointes
         `)
         .eq('user_id', user.id);
 
@@ -47,11 +48,11 @@ export default function MyRequest() {
 
       if (data) {
         console.log('Données reçues:', data); // Pour le débogage
-        const transformedData: DemandeSupabase[] = data.map((item: RawDemandeSupabase) => ({
+        const transformedData: DemandeSupabase[] = data.map((item: any) => ({
           id: item.id_absence,
           utilisateurtest: {
-            nom: item.utilisateurtest.nom || 'Non renseigné',
-            prenom: item.utilisateurtest.prenom || 'Non renseigné'
+            nom: Array.isArray(item.utilisateurtest) ? item.utilisateurtest[0]?.nom || 'Non renseigné' : item.utilisateurtest?.nom || 'Non renseigné',
+            prenom: Array.isArray(item.utilisateurtest) ? item.utilisateurtest[0]?.prenom || 'Non renseigné' : item.utilisateurtest?.prenom || 'Non renseigné'
           },
           absence_date: item.absence_date,
           absence_dateFin: item.absence_dateFin,
@@ -61,7 +62,8 @@ export default function MyRequest() {
           heure_remplacement_deb: item.heure_remplacement_deb,
           heure_remplacement_fin: item.heure_remplacement_fin,
           salle_remplacement: item.salle_remplacement,
-          classe: item.classe
+          classe: item.classe,
+          pieces_jointes: item.pieces_jointes || []
         }));
         
         // Trier par date d'absence (plus récente en premier)
@@ -189,6 +191,29 @@ export default function MyRequest() {
                         </Text>
                       </View>
                     )}
+                  </View>
+                )}
+
+                {/* Pièces jointes */}
+                {demande.pieces_jointes && demande.pieces_jointes.length > 0 && (
+                  <View style={styles.attachmentsContainer}>
+                    <Text style={styles.attachmentsTitle}>📎 Pièces jointes</Text>
+                    {demande.pieces_jointes.map((url, index) => {
+                      const fileName = url.split('/').pop() || `Fichier ${index + 1}`;
+                      return (
+                        <TouchableOpacity
+                          key={index}
+                          style={styles.attachmentItem}
+                          onPress={() => Linking.openURL(url)}
+                        >
+                          <Text style={styles.attachmentIcon}>📄</Text>
+                          <Text style={styles.attachmentName} numberOfLines={1}>
+                            {fileName}
+                          </Text>
+                          <Text style={styles.attachmentAction}>⬇️</Text>
+                        </TouchableOpacity>
+                      );
+                    })}
                   </View>
                 )}
               </View>
@@ -345,5 +370,42 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#1e293b",
     fontWeight: "600",
+  },
+  attachmentsContainer: {
+    marginTop: 16,
+    paddingTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "#e2e8f0",
+  },
+  attachmentsTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#6366f1",
+    marginBottom: 12,
+    letterSpacing: -0.3,
+  },
+  attachmentItem: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#f8fafc",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+  },
+  attachmentIcon: {
+    fontSize: 20,
+    marginRight: 10,
+  },
+  attachmentName: {
+    flex: 1,
+    fontSize: 14,
+    color: "#1e293b",
+    fontWeight: "500",
+  },
+  attachmentAction: {
+    fontSize: 18,
+    marginLeft: 10,
   },
 });

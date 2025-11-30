@@ -13,6 +13,7 @@ export interface RawDemandeSupabase {
   heure_remplacement_fin?: string | null;
   salle_remplacement?: string | null;
   classe?: string | null;
+  pieces_jointes?: string[] | null;
 }
 
 export interface DemandeSupabase {
@@ -30,6 +31,7 @@ export interface DemandeSupabase {
   heure_remplacement_fin?: string | null;
   salle_remplacement?: string | null;
   classe?: string | null;
+  pieces_jointes?: string[];
 }
 
 export interface NewDemande {

@@ -7,6 +7,8 @@ import TimeSelector from "../components/TimeSelector";
 import { supabase } from './supabase.js';
 import { NewDemande } from '../types/demande';
 import { useUserContext } from "./usercontext";
+import * as DocumentPicker from 'expo-document-picker';
+import * as Sharing from 'expo-sharing';
 
 export default function Request() {
   const [motif, setMotif] = useState("");
@@ -25,6 +27,7 @@ export default function Request() {
   const [showReplacementCalendar, setShowReplacementCalendar] = useState(false);
   const [showStartTimeSelector, setShowStartTimeSelector] = useState(false);
   const [showEndTimeSelector, setShowEndTimeSelector] = useState(false);
+  const [attachments, setAttachments] = useState<Array<{uri: string, name: string, size: number, mimeType?: string}>>([]);
   
   const motifsPossibles = [
     "Maladie",
@@ -52,6 +55,118 @@ export default function Request() {
       setCustomMotif("");
     }
     setShowMotifSelector(false);
+  };
+
+  const pickDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: ['application/pdf', 'image/*', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+        copyToCacheDirectory: true,
+        multiple: true,
+      });
+
+      if (!result.canceled && result.assets) {
+        const newFiles = result.assets.map(asset => ({
+          uri: asset.uri,
+          name: asset.name,
+          size: asset.size || 0,
+          mimeType: asset.mimeType,
+        }));
+
+        // Vérifier la taille des fichiers (max 5 MB par fichier)
+        const oversizedFiles = newFiles.filter(file => file.size > 5 * 1024 * 1024);
+        if (oversizedFiles.length > 0) {
+          Alert.alert(
+            "Fichier trop volumineux",
+            `Les fichiers suivants dépassent 5 MB et ne peuvent pas être ajoutés :\n${oversizedFiles.map(f => f.name).join('\n')}`
+          );
+          return;
+        }
+
+        setAttachments([...attachments, ...newFiles]);
+        Alert.alert("Succès", `${newFiles.length} fichier(s) ajouté(s)`);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la sélection du fichier:", error);
+      Alert.alert("Erreur", "Impossible de sélectionner le fichier");
+    }
+  };
+
+  const removeAttachment = (index: number) => {
+    Alert.alert(
+      "Supprimer",
+      "Voulez-vous supprimer cette pièce jointe ?",
+      [
+        { text: "Annuler", style: "cancel" },
+        {
+          text: "Supprimer",
+          style: "destructive",
+          onPress: () => {
+            setAttachments(attachments.filter((_, i) => i !== index));
+          },
+        },
+      ]
+    );
+  };
+
+  const uploadAttachments = async (demandeId: number): Promise<string[]> => {
+    const uploadedUrls: string[] = [];
+
+    for (const attachment of attachments) {
+      try {
+        // Lire le fichier
+        const response = await fetch(attachment.uri);
+        const arrayBuffer = await response.arrayBuffer();
+        const fileData = new Uint8Array(arrayBuffer);
+        
+        // Créer un nom de fichier unique
+        const fileExt = attachment.name.split('.').pop();
+        const fileName = `${demandeId}_${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+        const filePath = `demande-pieces-jointes/${fileName}`;
+
+        // Upload vers Supabase Storage
+        const { data, error } = await supabase.storage
+          .from('pieces-jointes')
+          .upload(filePath, fileData, {
+            contentType: attachment.mimeType || 'application/octet-stream',
+            upsert: false,
+          });
+
+        if (error) {
+          console.error('Erreur upload fichier:', error);
+          throw error;
+        }
+
+        // Obtenir l'URL publique
+        const { data: urlData } = supabase.storage
+          .from('pieces-jointes')
+          .getPublicUrl(filePath);
+
+        uploadedUrls.push(urlData.publicUrl);
+      } catch (error) {
+        console.error('Erreur lors de l\'upload:', error);
+      }
+    }
+
+    return uploadedUrls;
+  };
+
+  const downloadAttachment = async (attachment: {uri: string, name: string, mimeType?: string}) => {
+    try {
+      // Vérifier si le partage est disponible
+      const isAvailable = await Sharing.isAvailableAsync();
+      if (isAvailable) {
+        await Sharing.shareAsync(attachment.uri, {
+          mimeType: attachment.mimeType,
+          dialogTitle: `Télécharger ${attachment.name}`,
+        });
+      } else {
+        Alert.alert("Info", "Le partage n'est pas disponible sur cet appareil");
+      }
+    } catch (error) {
+      console.error("Erreur lors du téléchargement:", error);
+      Alert.alert("Erreur", "Impossible de télécharger le fichier");
+    }
   };
   
   const handleDateRangeSelect = (start: Date, end: Date) => {
@@ -227,13 +342,33 @@ export default function Request() {
           date_maj: now
         };
         
-        const { error } = await supabase
+        // Insérer la demande et récupérer l'ID
+        const { data: insertedData, error: insertError } = await supabase
           .from('demande_absence')
-          .insert(newDemande);
+          .insert(newDemande)
+          .select('id_absence')
+          .single();
 
-        if (error) {
-          console.error("Erreur Supabase:", error);
-          throw error;
+        if (insertError) {
+          console.error("Erreur Supabase:", insertError);
+          throw insertError;
+        }
+
+        // Upload des pièces jointes si présentes
+        if (attachments.length > 0 && insertedData) {
+          const uploadedUrls = await uploadAttachments(insertedData.id_absence);
+          
+          // Mettre à jour la demande avec les URLs des pièces jointes
+          if (uploadedUrls.length > 0) {
+            const { error: updateError } = await supabase
+              .from('demande_absence')
+              .update({ pieces_jointes: uploadedUrls })
+              .eq('id_absence', insertedData.id_absence);
+
+            if (updateError) {
+              console.error("Erreur mise à jour pièces jointes:", updateError);
+            }
+          }
         }
 
         Alert.alert(
@@ -253,6 +388,7 @@ export default function Request() {
               setReplacementEndTime("");
               setReplacementRoom("");
               setReplacementClass("");
+              setAttachments([]);
             }
           }]
         );
@@ -334,10 +470,53 @@ export default function Request() {
                   setCustomMotif(text);
                   setMotif(text);
                 }}
-                multiline
               />
             </View>
           )}
+
+          {/* Section Pièces jointes */}
+          <View style={styles.attachmentSection}>
+            <Text style={styles.sectionTitle}>📎 Pièces justificatives</Text>
+            
+            <TouchableOpacity
+              style={styles.attachmentButton}
+              onPress={pickDocument}
+            >
+              <Text style={styles.attachmentButtonText}>+ Ajouter un fichier</Text>
+            </TouchableOpacity>
+            <Text style={styles.attachmentHint}>
+              Formats acceptés: PDF, Images, Word (max 5 MB par fichier)
+            </Text>
+
+            {attachments.length > 0 && (
+              <View style={styles.attachmentList}>
+                {attachments.map((attachment, index) => (
+                  <View key={index} style={styles.attachmentItem}>
+                    <View style={styles.attachmentInfo}>
+                      <Text style={styles.attachmentName}>📄 {attachment.name}</Text>
+                      <Text style={styles.attachmentSize}>
+                        {(attachment.size / 1024).toFixed(1)} KB
+                      </Text>
+                    </View>
+                    <View style={styles.attachmentActions}>
+                      <TouchableOpacity
+                        style={styles.downloadButton}
+                        onPress={() => downloadAttachment(attachment)}
+                      >
+                        <Text style={styles.downloadButtonText}>⬇️</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        style={styles.removeButton}
+                        onPress={() => removeAttachment(index)}
+                      >
+                        <Text style={styles.removeButtonText}>✕</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
 
           {/* Section Remplacement */}
           <View style={styles.replacementSection}>
@@ -679,5 +858,95 @@ const styles = StyleSheet.create({
   customMotifContainer: {
     marginTop: -12,
     marginBottom: 20,
+  },
+  attachmentSection: {
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    padding: 20,
+    marginBottom: 24,
+    shadowColor: "#6366f1",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+  },
+  attachmentButton: {
+    backgroundColor: "#ffffff",
+    borderWidth: 2,
+    borderColor: "#6366f1",
+    borderStyle: "dashed",
+    borderRadius: 12,
+    paddingVertical: 16,
+    alignItems: "center",
+    marginBottom: 8,
+  },
+  attachmentButtonText: {
+    color: "#6366f1",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  attachmentHint: {
+    fontSize: 13,
+    color: "#64748b",
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  attachmentList: {
+    marginTop: 8,
+  },
+  attachmentItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    backgroundColor: "#f8fafc",
+    borderRadius: 10,
+    padding: 12,
+    marginBottom: 8,
+    borderWidth: 1,
+    borderColor: "#e2e8f0",
+  },
+  attachmentInfo: {
+    flex: 1,
+    marginRight: 12,
+  },
+  attachmentName: {
+    fontSize: 14,
+    color: "#1e293b",
+    fontWeight: "500",
+    marginBottom: 4,
+  },
+  attachmentSize: {
+    fontSize: 12,
+    color: "#64748b",
+  },
+  attachmentActions: {
+    flexDirection: "row",
+    gap: 8,
+  },
+  downloadButton: {
+    backgroundColor: "#10b981",
+    borderRadius: 8,
+    width: 36,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  downloadButtonText: {
+    fontSize: 18,
+  },
+  removeButton: {
+    backgroundColor: "#ef4444",
+    borderRadius: 8,
+    width: 36,
+    height: 36,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  removeButtonText: {
+    color: "#ffffff",
+    fontSize: 18,
+    fontWeight: "700",
   },
 });
