@@ -1,0 +1,37 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="100" cy="100" r="95" fill="#6366f1"/>
+  
+  <!-- Calendar Icon -->
+  <rect x="50" y="60" width="100" height="90" rx="8" fill="white"/>
+  
+  <!-- Calendar Header -->
+  <rect x="50" y="60" width="100" height="20" rx="8" fill="#818cf8"/>
+  <rect x="50" y="70" width="100" height="10" fill="#818cf8"/>
+  
+  <!-- Calendar Rings -->
+  <circle cx="70" cy="60" r="5" fill="#818cf8"/>
+  <circle cx="100" cy="60" r="5" fill="#818cf8"/>
+  <circle cx="130" cy="60" r="5" fill="#818cf8"/>
+  
+  <!-- Calendar Grid -->
+  <line x1="60" y1="90" x2="140" y2="90" stroke="#e0e7ff" stroke-width="1"/>
+  <line x1="60" y1="105" x2="140" y2="105" stroke="#e0e7ff" stroke-width="1"/>
+  <line x1="60" y1="120" x2="140" y2="120" stroke="#e0e7ff" stroke-width="1"/>
+  <line x1="60" y1="135" x2="140" y2="135" stroke="#e0e7ff" stroke-width="1"/>
+  
+  <line x1="75" y1="80" x2="75" y2="150" stroke="#e0e7ff" stroke-width="1"/>
+  <line x1="95" y1="80" x2="95" y2="150" stroke="#e0e7ff" stroke-width="1"/>
+  <line x1="115" y1="80" x2="115" y2="150" stroke="#e0e7ff" stroke-width="1"/>
+  <line x1="135" y1="80" x2="135" y2="150" stroke="#e0e7ff" stroke-width="1"/>
+  
+  <!-- Marked Days (X marks for absent days) -->
+  <path d="M 82 97 L 88 103 M 88 97 L 82 103" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 102 112 L 108 118 M 108 112 L 102 118" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 122 127 L 128 133 M 128 127 L 122 133" stroke="#ef4444" stroke-width="3" stroke-linecap="round"/>
+  
+  <!-- User Icon Overlay -->
+  <circle cx="140" cy="130" r="20" fill="#6366f1"/>
+  <circle cx="140" cy="125" r="7" fill="white"/>
+  <path d="M 128 143 Q 140 138 152 143" stroke="white" stroke-width="3" stroke-linecap="round" fill="none"/>
+</svg>

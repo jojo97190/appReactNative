@@ -4,6 +4,8 @@ import { supabase } from "./supabase.js";
 import 'react-native-url-polyfill/auto';
 import { useUserContext } from "./usercontext";
 import { useRouter } from "expo-router";  // <-- import du router
+import { registerForPushNotificationsAsync } from "../services/notificationService";
+import AbsentisLogo from "../components/AbsentisLogo";
 
 export default function LoginScreen() {
   type User = {
@@ -58,6 +60,10 @@ export default function LoginScreen() {
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
+        <View style={styles.logoContainer}>
+          <AbsentisLogo size={120} />
+          <Text style={styles.appName}>Absentis</Text>
+        </View>
         <Text style={styles.title}>Connexion</Text>
 
         <TouchableOpacity
@@ -106,6 +112,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 24,
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 32,
+  },
+  appName: {
+    fontSize: 42,
+    fontWeight: "900",
+    color: "#6366f1",
+    marginTop: 16,
+    letterSpacing: -1,
   },
   title: {
     fontSize: 32,

@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "appReact",
-    "slug": "appReact",
+    "name": "Absentis",
+    "slug": "absentis",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "appreact",
+    "scheme": "absentis",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {

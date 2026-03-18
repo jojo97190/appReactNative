@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, Modal, ScrollView, KeyboardAvoidingView, Platform } from "react-native";
 import { supabase } from "./supabase.js";
 import { useRouter } from "expo-router";
+import AbsentisLogo from "../components/AbsentisLogo";
 
 export default function InscriptionScreen() {
   const [prenom, setPrenom] = useState("");
@@ -131,6 +132,10 @@ export default function InscriptionScreen() {
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
+        <View style={styles.logoContainer}>
+          <AbsentisLogo size={100} />
+          <Text style={styles.appName}>Absentis</Text>
+        </View>
         <Text style={styles.title}>Inscription</Text>
 
         <TextInput
@@ -249,6 +254,17 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     padding: 24,
+  },
+  logoContainer: {
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  appName: {
+    fontSize: 36,
+    fontWeight: "900",
+    color: "#6366f1",
+    marginTop: 12,
+    letterSpacing: -1,
   },
   title: {
     fontSize: 32,
