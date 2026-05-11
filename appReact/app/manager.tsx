@@ -249,8 +249,27 @@ const styles = StyleSheet.create({
     flex: 1, 
     backgroundColor: "#f0f4f8" 
   },
-  content: {
+
+  listContainer: {
+    paddingBottom: 20,
+  },
+
+  centerContainer: {
     flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: "#666",
+  },
+
+  errorText: {
+    fontSize: 16,
+    color: "#ef4444",
+    textAlign: "center",
     padding: 20,
   },
   pageTitle: {
@@ -259,24 +278,6 @@ const styles = StyleSheet.create({
     color: "#1e293b",
     marginBottom: 20,
     letterSpacing: -0.5,
-  },
-  listContainer: {
-    paddingBottom: 30,
-  },
-  centerContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  loadingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: "#666",
-  },
-  errorText: {
-    fontSize: 16,
-    color: "#ef4444",
-    textAlign: "center",
   },
   emptyText: {
     textAlign: "center",
