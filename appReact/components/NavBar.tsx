@@ -1,12 +1,12 @@
 import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import LoginBubble from "../components/LoginBubble";
 
 export default function NavBar() {
   const router = useRouter();
 
   const navButtons = [
     { title: "Accueil", route: "/" },
-    { title: "Login", route: "/login" },
     { title: "Manager", route: "/manager" },
     { title: "Request", route: "/request" },
     { title: "My Request", route: "/my-request" },
@@ -14,15 +14,18 @@ export default function NavBar() {
 
   return (
     <View style={styles.navbar}>
-      {navButtons.map((button, index) => (
-        <TouchableOpacity
-          key={index}
-          style={styles.navButton}
-          onPress={() => router.push(button.route as any)}
-        >
-          <Text style={styles.navButtonText}>{button.title}</Text>
-        </TouchableOpacity>
-      ))}
+      <View style={styles.buttonsContainer}>
+        {navButtons.map((button, index) => (
+          <TouchableOpacity
+            key={index}
+            style={styles.navButton}
+            onPress={() => router.push(button.route as any)}
+          >
+            <Text style={styles.navButtonText}>{button.title}</Text>
+          </TouchableOpacity>
+        ))}
+      </View>
+      <LoginBubble />
     </View>
   );
 }
@@ -31,8 +34,10 @@ const styles = StyleSheet.create({
   navbar: {
     flexDirection: "row",
     alignItems: "center",
-    flexWrap: "wrap",
-    gap: 6,
+    paddingBottom: 0,
+    justifyContent: "space-between",
+    width: "100%",
+    paddingVertical: 15,
   },
   navButton: {
     backgroundColor: "#007AFF",
@@ -42,7 +47,13 @@ const styles = StyleSheet.create({
   },
   navButtonText: {
     color: "white",
-    fontSize: 11,
+    fontSize: 16,
     fontWeight: "600",
+  },
+  buttonsContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    flexWrap: "wrap",
+    gap: 6,
   },
 });
