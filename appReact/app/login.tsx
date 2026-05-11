@@ -1,80 +1,152 @@
+import { useRouter } from "expo-router"; // <-- import du router
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity } from "react-native";
+import 'react-native-url-polyfill/auto';
+import { supabase } from "./supabase.js";
+import { useUserContext } from "./usercontext";
 
 export default function LoginScreen() {
+  type User = {
+    role: string | null;
+    id: string | null;
+    nom?: string;
+    prenom?: string;
+  };
+  const { updateUser, user } = useUserContext() as { updateUser: (user: User) => void; user: User };
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();  // <-- instanciation du router
 
-  const handleLogin = () => {
-    // Ici tu peux ajouter la logique de connexion (API, vérification, etc.)
-    console.log("Email:", email);
-    console.log("Mot de passe:", password);
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert("Erreur", "Veuillez remplir tous les champs.");
+      return;
+    }
+
+    setLoading(true);
+
+    const { data, error } = await supabase
+      .from("utilisateurtest")
+      .select("role,id_utilisateur,nom,prenom")
+      .eq("email", email.trim())
+      .eq("mot_de_passe", password.trim())
+      .single();
+
+    setLoading(false);
+
+    if (error || !data) {
+      Alert.alert("Erreur", "Email ou mot de passe incorrect.");
+      console.log("Erreur récupération rôle :", error);
+      return;
+    }
+
+    updateUser({ role: data.role, id: data.id_utilisateur, nom: data.nom, prenom: data.prenom });
+
+    console.log("ID utilisateur :", data.id_utilisateur);
+    
+    router.push("/");  // <-- redirection vers la page index.tsx
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Connexion</Text>
+    <KeyboardAvoidingView 
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={0}
+    >
+      <ScrollView 
+        contentContainerStyle={styles.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
+        <Text style={styles.title}>Connexion</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        placeholderTextColor="#aaa"
-        keyboardType="email-address"
-        autoCapitalize="none"
-        value={email}
-        onChangeText={setEmail}
-      />
+        <TouchableOpacity
+          style={[styles.button, { backgroundColor: "#373737ff", marginTop: 10, top:260 }]}
+          onPress={() => router.push("/inscription")}
+        >
+          <Text style={styles.buttonText}>Créer un compte</Text>
+        </TouchableOpacity>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Mot de passe"
-        placeholderTextColor="#aaa"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="#aaa"
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
+        />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin}>
-        <Text style={styles.buttonText}>Se connecter</Text>
-      </TouchableOpacity>
-    </View>
+        <TextInput
+          style={styles.input}
+          placeholder="Mot de passe"
+          placeholderTextColor="#aaa"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
+
+        <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+          <Text style={styles.buttonText}>
+            {loading ? "Connexion..." : "Se connecter"}
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#f0f4f8",
+  },
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: "center",
     alignItems: "center",
-    backgroundColor: "#f9f9f9",
-    padding: 20,
+    padding: 24,
   },
   title: {
-    fontSize: 26,
-    fontWeight: "bold",
-    marginBottom: 40,
+    fontSize: 32,
+    fontWeight: "800",
+    marginBottom: 48,
+    color: "#1e293b",
+    letterSpacing: -0.5,
   },
   input: {
     width: "100%",
-    height: 50,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 8,
-    paddingHorizontal: 15,
-    marginBottom: 20,
+    height: 56,
+    borderWidth: 2,
+    borderColor: "#e2e8f0",
+    borderRadius: 12,
+    paddingHorizontal: 18,
+    marginBottom: 16,
     backgroundColor: "#fff",
+    fontSize: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 4,
+    elevation: 2,
   },
   button: {
     width: "100%",
-    height: 50,
-    backgroundColor: "#007bff",
+    height: 56,
+    backgroundColor: "#6366f1",
     justifyContent: "center",
     alignItems: "center",
-    borderRadius: 8,
+    borderRadius: 12,
+    shadowColor: "#6366f1",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   buttonText: {
     color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
+    fontSize: 17,
+    fontWeight: "700",
+    letterSpacing: 0.3,
   },
 });

@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 
-interface DateSelectorProps {
-  onDateRangeSelect?: (startDate: Date, endDate: Date) => void;
+interface SingleDateSelectorProps {
+  onDateSelect?: (date: Date) => void;
 }
 
-export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
+export default function SingleDateSelector({ onDateSelect }: SingleDateSelectorProps) {
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
   // Générer les jours du mois actuel
@@ -50,9 +49,9 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
   };
 
   const handleDatePress = (date: Date) => {
-    // Empêcher la sélection des dates passées, d'aujourd'hui et des weekends
-    if (isPastOrTodayDate(date)) {
-      Alert.alert('Date invalide', 'Vous ne pouvez pas sélectionner une date passée ou la date d\'aujourd\'hui.');
+    // Empêcher la sélection des dates passées et des weekends
+    if (isPastDate(date)) {
+      Alert.alert('Date invalide', 'Vous ne pouvez pas sélectionner une date dépassée.');
       return;
     }
     if (isWeekend(date)) {
@@ -60,57 +59,25 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
       return;
     }
 
-    if (!startDate || (startDate && endDate)) {
-      // Première sélection ou reset
-      setStartDate(date);
-      setEndDate(null);
-    } else if (startDate && !endDate) {
-      // Deuxième sélection
-      if (date >= startDate) {
-        setEndDate(date);
-        onDateRangeSelect?.(startDate, date);
-      } else {
-        // Si la date est antérieure, inverser
-        setStartDate(date);
-        setEndDate(startDate);
-        onDateRangeSelect?.(date, startDate);
-      }
-    }
+    setSelectedDate(date);
+    onDateSelect?.(date);
   };
 
-  const isDateInRange = (date: Date) => {
-    if (!startDate) return false;
-    if (!endDate) return date.getTime() === startDate.getTime();
-    return date >= startDate && date <= endDate;
-  };
-
-  const isStartDate = (date: Date) => {
-    return startDate && date.getTime() === startDate.getTime();
-  };
-
-  const isEndDate = (date: Date) => {
-    return endDate && date.getTime() === endDate.getTime();
+  const isSelectedDate = (date: Date) => {
+    return selectedDate && date.getTime() === selectedDate.getTime();
   };
 
   const isPastDate = (date: Date) => {
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Réinitialiser l'heure pour ne comparer que les dates
+    today.setHours(0, 0, 0, 0);
     const compareDate = new Date(date);
     compareDate.setHours(0, 0, 0, 0);
     return compareDate < today;
   };
 
-  const isPastOrTodayDate = (date: Date) => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0); // Réinitialiser l'heure pour ne comparer que les dates
-    const compareDate = new Date(date);
-    compareDate.setHours(0, 0, 0, 0);
-    return compareDate <= today; // <= pour inclure aujourd'hui
-  };
-
   const isWeekend = (date: Date) => {
     const day = date.getDay();
-    return day === 0 || day === 6; // 0 = dimanche, 6 = samedi
+    return day === 0 || day === 6;
   };
 
   const goToPreviousMonth = () => {
@@ -129,19 +96,6 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
     return date.toLocaleDateString('fr-FR');
   };
 
-  const validateSelection = () => {
-    if (startDate && endDate) {
-      const days = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1;
-      Alert.alert(
-        'Durée sélectionnée',
-        `Du ${formatDate(startDate)} au ${formatDate(endDate)}\nDurée: ${days} jour(s)`,
-        [{ text: 'OK' }]
-      );
-    } else {
-      Alert.alert('Sélection incomplète', 'Veuillez sélectionner une date de début et de fin');
-    }
-  };
-
   const days = generateCalendarDays();
   const monthNames = [
     'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
@@ -151,7 +105,7 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Sélectionner une durée</Text>
+      <Text style={styles.title}>Sélectionner une date</Text>
       
       {/* Navigation du mois */}
       <View style={styles.monthHeader}>
@@ -185,20 +139,18 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
                 style={[
                   styles.dayCell,
                   !date && styles.emptyCell,
-                  date && isDateInRange(date) && styles.selectedCell,
-                  date && isStartDate(date) && styles.startDateCell,
-                  date && isEndDate(date) && styles.endDateCell,
-                  date && isPastOrTodayDate(date) && styles.pastDateCell,
+                  date && isSelectedDate(date) && styles.selectedCell,
+                  date && isPastDate(date) && styles.pastDateCell,
                   date && isWeekend(date) && styles.weekendCell,
                 ]}
                 onPress={() => date && handleDatePress(date)}
-                disabled={!date || (date && (isPastOrTodayDate(date) || isWeekend(date)))}
+                disabled={!date || (date && (isPastDate(date) || isWeekend(date)))}
               >
                 <Text
                   style={[
                     styles.dayText,
-                    date && isDateInRange(date) && styles.selectedText,
-                    date && isPastOrTodayDate(date) && styles.pastDateText,
+                    date && isSelectedDate(date) && styles.selectedText,
+                    date && isPastDate(date) && styles.pastDateText,
                     date && isWeekend(date) && styles.weekendText,
                   ]}
                 >
@@ -210,30 +162,22 @@ export default function DateSelector({ onDateRangeSelect }: DateSelectorProps) {
         ))}
       </View>
 
-      {/* Informations de sélection */}
+      {/* Information de sélection */}
       <View style={styles.selectionInfo}>
         <Text style={styles.infoText}>
-          {startDate ? `Début: ${formatDate(startDate)}` : 'Sélectionnez une date de début'}
-        </Text>
-        <Text style={styles.infoText}>
-          {endDate ? `Fin: ${formatDate(endDate)}` : 'Sélectionnez une date de fin'}
+          {selectedDate ? `Date sélectionnée: ${formatDate(selectedDate)}` : 'Sélectionnez une date'}
         </Text>
       </View>
-
-      {/* Bouton de validation */}
-      <TouchableOpacity style={styles.validateButton} onPress={validateSelection}>
-        <Text style={styles.validateButtonText}>Valider la sélection</Text>
-      </TouchableOpacity>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    height: 500,
+    height: 450,
     backgroundColor: "#ffffff",
-    padding: 10,
-    borderRadius: 10,
+    padding: 20,
+    borderRadius: 20,
     margin: 10,
     shadowColor: "#6366f1",
     shadowOffset: {
@@ -313,12 +257,6 @@ const styles = StyleSheet.create({
     backgroundColor: "transparent",
   },
   selectedCell: {
-    backgroundColor: "#e0e7ff",
-  },
-  startDateCell: {
-    backgroundColor: "#6366f1",
-  },
-  endDateCell: {
     backgroundColor: "#6366f1",
   },
   dayText: {
@@ -358,23 +296,5 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 3,
     fontWeight: "500",
-  },
-  validateButton: {
-    backgroundColor: "#6366f1",
-    padding: 14,
-    borderRadius: 12,
-    alignItems: "center",
-    marginTop: 8,
-    shadowColor: "#6366f1",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 4,
-  },
-  validateButtonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "700",
-    letterSpacing: 0.3,
   },
 });

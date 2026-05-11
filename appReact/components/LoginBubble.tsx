@@ -16,23 +16,20 @@ export default function LoginBubble() {
 
 const styles = StyleSheet.create({
   bubbleButton: {
-    position: "relative",
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    right: 45,
-    backgroundColor: "#007AFF",
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: "#6366f1",
     justifyContent: "center",
     alignItems: "center",
-    shadowColor: "#000",
+    shadowColor: "#6366f1",
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 4,
     },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    zIndex: 1000,
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   bubbleText: {
     fontSize: 24,
