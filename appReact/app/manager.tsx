@@ -3,14 +3,22 @@ import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "
 import NavBar from "../components/NavBar";
 import { supabase } from "./supabase.js";
 
+// Page réservée au manager : affiche toutes les demandes d'absence "en attente" (statut "et")
+// Le manager peut valider ("acc") ou refuser ("rf") chaque demande.
 export default function Manager() {
+  // Liste des demandes récupérées depuis Supabase
   const [rows, setRows] = useState<any[]>([]);
+  // Indique si les données sont en cours de chargement
   const [loading, setLoading] = useState(true);
+  // Message d'erreur à afficher si une requête échoue
   const [errorMsg, setErrorMsg] = useState("");
+  // ID de la demande en cours de traitement (évite les doubles clics)
   const [busyId, setBusyId] = useState<number | null>(null);
 
+  // Chargement des demandes au montage du composant
   useEffect(() => {
     async function fetchData() {
+      // Récupère toutes les demandes avec le statut "en attente" (et), triées par date décroissante
       const { data, error } = await supabase
         .from("user_demandes")
         .select("*")
@@ -21,29 +29,31 @@ export default function Manager() {
         console.error(error);
         setErrorMsg(error.message);
       } else {
+        // Date d'aujourd'hui à minuit pour pouvoir comparer sans tenir compte de l'heure
         const today = new Date();
-        today.setHours(0, 0, 0, 0); // Minuit aujourd'hui (heure locale)
+        today.setHours(0, 0, 0, 0);
 
         const processedData = await Promise.all(
           (data || []).map(async (d) => {
-            // 1. Correction du décalage horaire : On découpe manuellement "YYYY-MM-DD"
-            const dateString = d.absence_date.substring(0, 10); // Extrait "2026-03-17"
+            // Extraction de la date au format "YYYY-MM-DD" pour éviter les décalages UTC
+            const dateString = d.absence_date.substring(0, 10);
             const [year, month, day] = dateString.split("-");
-            
-            // On crée la date localement en évitant le décalage UTC (le mois commence à 0 en JS)
+
+            // Création d'une date locale (le mois est indexé à 0 en JavaScript)
             const absenceDate = new Date(year, month - 1, day);
             absenceDate.setHours(0, 0, 0, 0);
 
-            // 2. Correction de la condition : On refuse UNIQUEMENT si la date est dans le passé (<)
+            // Si la date d'absence est déjà passée, on refuse automatiquement la demande
             if (absenceDate < today) {
               await supabase
                 .from("demande_absence")
                 .update({ statut: "rf" })
                 .eq("id_absence", d.id_absence);
-              
-              return null; // On ne l'affiche pas, elle est refusée
+
+              return null; // On n'affiche pas cette demande dans la liste
             }
 
+            // Retourne les champs nécessaires à l'affichage de la carte
             return {
               id_absence: d.id_absence,
               nom: d.nom,
@@ -64,6 +74,7 @@ export default function Manager() {
           })
         );
 
+        // On filtre les demandes nulles (automatiquement refusées)
         setRows(processedData.filter(item => item !== null));
       }
       setLoading(false);
@@ -71,9 +82,10 @@ export default function Manager() {
     fetchData();
   }, []);
 
+  // Met à jour le statut d'une demande dans Supabase puis la retire de la liste affichée
   const handleSetStatus = async (id_absence: number, newStatus: string) => {
     try {
-      setBusyId(id_absence);
+      setBusyId(id_absence); // Bloque les boutons de cette carte pendant la requête
 
       const { error } = await supabase
         .from("demande_absence")
@@ -83,17 +95,19 @@ export default function Manager() {
       if (error) {
         setErrorMsg(error.message);
       } else {
-        setRows(prevRows => 
+        // Supprime la demande de la liste locale une fois traitée
+        setRows(prevRows =>
           prevRows.filter(row => row.id_absence !== id_absence)
         );
       }
     } catch (e) {
       setErrorMsg(String(e));
     } finally {
-      setBusyId(null);
+      setBusyId(null); // Réactive les boutons
     }
   };
 
+  // Affichage du spinner pendant le chargement
   if (loading) {
     return (
       <View style={styles.container}>
@@ -106,6 +120,7 @@ export default function Manager() {
     );
   }
 
+  // Affichage d'un message si une erreur Supabase s'est produite
   if (errorMsg) {
     return (
       <View style={styles.container}>
@@ -117,42 +132,45 @@ export default function Manager() {
     );
   }
 
+  // Retourne la couleur du badge selon le statut de la demande
   const getStatusColor = (statut: string) => {
     switch (statut) {
-      case "acc": return "#10b981"; // Vert
-      case "rf": return "#ef4444";  // Rouge
-      case "et": return "#f59e0b";  // Orange
-      default: return "#6b7280";    // Gris
+      case "acc": return "#10b981"; // Vert  → Validée
+      case "rf":  return "#ef4444"; // Rouge → Refusée
+      case "et":  return "#f59e0b"; // Orange → En attente
+      default:    return "#6b7280"; // Gris  → Inconnu
     }
   };
 
+  // Retourne le libellé lisible du statut
   const getStatusLabel = (statut: string) => {
     switch (statut) {
       case "acc": return "Validée";
-      case "rf": return "Refusée";
-      case "et": return "En attente";
-      default: return statut;
+      case "rf":  return "Refusée";
+      case "et":  return "En attente";
+      default:    return statut;
     }
   };
 
+  // Carte affichée pour chaque demande d'absence
   const BoxCard = ({ item }: { item: any }) => {
+    // Vrai si cette demande est en cours de traitement (boutons désactivés)
     const isBusy = busyId === item.id_absence;
-    
+
     return (
       <View style={styles.boxCard}>
-        {/* En-tête de la box */}
+        {/* En-tête : nom, email et badge de statut */}
         <View style={styles.boxHeader}>
           <View>
             <Text style={styles.boxTitle}>{item.prenom} {item.nom}</Text>
             <Text style={styles.boxSubtitle}>{item.email}</Text>
           </View>
-          {/* Badge de statut utilisé ici ! */}
           <View style={[styles.statusBadge, { backgroundColor: getStatusColor(item.statut) }]}>
             <Text style={styles.statusText}>{getStatusLabel(item.statut)}</Text>
           </View>
         </View>
 
-        {/* Corps de la box */}
+        {/* Corps : période, raison, commentaire et éventuellement le remplacement */}
         <View style={styles.boxBody}>
           <View style={styles.infoBlock}>
             <Text style={styles.label}>Période</Text>
@@ -164,6 +182,7 @@ export default function Manager() {
             <Text style={styles.value}>{item.raison || "Non renseignée"}</Text>
           </View>
 
+          {/* Commentaire optionnel laissé par l'employé */}
           {item.commentaire && (
             <View style={styles.infoBlock}>
               <Text style={styles.label}>Commentaire</Text>
@@ -171,7 +190,7 @@ export default function Manager() {
             </View>
           )}
 
-          {/* Remplacement (si existe) */}
+          {/* Bloc remplacement : affiché uniquement si une date de remplacement existe */}
           {item.date_remplacement && (
             <View style={styles.replacementBox}>
               <Text style={styles.replacementTitle}>🔄 Remplacement prévu</Text>
@@ -197,7 +216,7 @@ export default function Manager() {
           )}
         </View>
 
-        {/* Boutons d'action */}
+        {/* Pied de carte : boutons Valider / Refuser (ou spinner si en cours) */}
         <View style={styles.boxFooter}>
           {isBusy ? (
             <ActivityIndicator color="#3B82F6" />
@@ -225,10 +244,11 @@ export default function Manager() {
   return (
     <View style={styles.container}>
       <NavBar />
-      
+
       <View style={styles.content}>
         <Text style={styles.pageTitle}>Demandes en attente</Text>
-        
+
+        {/* Liste scrollable des cartes de demande */}
         <FlatList
           data={rows}
           keyExtractor={(item, i) => String(item.id_absence ?? i)}
@@ -245,9 +265,9 @@ export default function Manager() {
 }
 
 const styles = StyleSheet.create({
-  container: { 
-    flex: 1, 
-    backgroundColor: "#f0f4f8" 
+  container: {
+    flex: 1,
+    backgroundColor: "#f0f4f8"
   },
 
   listContainer: {
@@ -285,8 +305,8 @@ const styles = StyleSheet.create({
     color: "#64748b",
     marginTop: 40,
   },
-  
-  // --- STYLES DES PETITES BOX ---
+
+  // --- STYLES DES CARTES ---
   boxCard: {
     backgroundColor: "#ffffff",
     borderRadius: 16,
@@ -386,8 +406,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: "center",
   },
-  btnText: { 
-    color: "#fff", 
+  btnText: {
+    color: "#fff",
     fontWeight: "700",
     fontSize: 14,
   },
