@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
 import NavBar from "../components/NavBar";
 import { supabase } from "./supabase.js";
@@ -59,7 +59,6 @@ export default function Manager() {
               nom: d.nom,
               prenom: d.prenom,
               email: d.email,
-              role: d.role,
               du: d.absence_date,
               au: d.absence_dateFin,
               raison: d.raison,
